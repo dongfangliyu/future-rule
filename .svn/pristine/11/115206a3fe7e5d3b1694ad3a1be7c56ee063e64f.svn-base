@@ -1,0 +1,274 @@
+package datamanager;
+
+import com.zw.rule.datamanage.po.CustList;
+import com.zw.rule.datamanage.po.ListDb;
+import com.zw.rule.datamanage.po.NodeListDb;
+import com.zw.rule.datamanage.po.TblColumn;
+import com.zw.rule.datamanage.service.ListDbService;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by luan on 2017/5/4.
+ */
+public class ListDbServiceTest {
+
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+    private ListDbService listDbService;
+
+    @Before
+    public void test() throws Exception {
+        listDbService = (ListDbService)cxt.getBean("listDbServiceImpl");
+    }
+
+    @Test
+    public void findByUser() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", "136");
+        param.put("listType", "b");
+        List<ListDb> list = listDbService.findByUser(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+
+    @Test
+    public void updateStatus() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        List list = new ArrayList();
+        list.add(111);
+        param.put("userId", "136");
+        param.put("status", "2");
+        param.put("Ids", list);
+        listDbService.updateStatus(param);
+    }
+
+    @Test
+    public void findByListDbName() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", "136");
+        param.put("listType", "b");
+        param.put("listName", "手机归属地-黑名单");
+        int id = listDbService.findByListDbName(param);
+        System.out.println(id);
+    }
+
+    @Test
+    public void findById() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", "136");
+        param.put("listType", "b");
+        param.put("id", "107");
+        ListDb listDb = listDbService.findById(param);
+        System.out.println(listDb);
+    }
+
+    @Test
+    public void findCustList() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("tableName", "organ_1_w_15");
+        List<CustList> list = listDbService.findCustList(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+
+    @Test
+    public void searchTop4Column() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("tableName", "organ_26_b_77");
+        param.put("searchKey", "辽宁");
+        param.put("colTop4Array", "id");
+        List<CustList> list = listDbService.searchTop4Column(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+
+    @Test
+    public void isExists() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", "136");
+        param.put("listType", "b");
+        param.put("listName", "手机归属地-黑名单");
+        param.put("listDbId", "107");
+        int i = listDbService.isExists(param);
+        System.out.println(i);
+    }
+
+    @Test
+    public void getColumnList() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("schemaName", "apollo_bak");
+        param.put("tableName", "t_user");
+        List<TblColumn> list = listDbService.getColumnList(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+
+    @Test
+    public void findCustListById() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("id", "13");
+        param.put("fieldName", "t0");
+        param.put("tableName", "organ_26_b_77");
+        CustList custList = listDbService.findCustListById(param);
+        System.out.println(custList.toString());
+    }
+
+    @Test
+    public void createCustList() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("checkCol", "t0 = '棋牌'");
+        param.put("t0", "棋牌");
+        param.put("userId", 136l);
+        param.put("nickName", "luan");
+        param.put("tableName", "organ_37_b_103");
+        int status = listDbService.createCustList(param);
+        System.out.println(status);
+    }
+
+    @Test
+    public void deleteCustList() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        List list = new ArrayList();
+        list.add(11l);
+        param.put("Ids", list);
+        param.put("tableName", "organ_37_b_103");
+        listDbService.deleteCustList(param);
+    }
+
+    @Test
+    public void findCustListByQueryKey() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("queryKey", "user_id = 120");
+        param.put("tableName", "organ_37_b_103");
+        int i = listDbService.findCustListByQueryKey(param);
+        System.out.println(i);
+    }
+
+    @Test
+    public void findListDbById() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("listDbId", 110);
+        param.put("userId", 136);
+        ListDb listDb = listDbService.findListDbById(param);
+        System.out.println(listDb);
+    }
+
+    @Test
+    public void findListDbByIds() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        List list = new ArrayList();
+        list.add(107);
+        list.add(108);
+        param.put("Ids", list);
+        param.put("listDbIds", list);
+        param.put("userId", 136);
+        List<ListDb> listDb = listDbService.findListDbByIds(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(listDb.get(i).toString());
+        }
+    }
+
+    @Test
+    public void createNodeListDb() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("nodeId", 24);
+        param.put("innerListdbs", "66,55");
+        param.put("outerListdbs", "44,33");
+        List list = new ArrayList();
+        list.add(107);
+        list.add(108);
+        param.put("Ids", list);
+        param.put("listDbIds", list);
+        param.put("userId", 136);
+        if(listDbService.createNodeListDb(param)){
+            System.out.println("成功");
+        }
+    }
+
+    @Test
+    public void updateNodeListDb() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("nodeId", 24);
+        param.put("innerListdbs", "55,55");
+        param.put("outerListdbs", "44,33");
+        List list = new ArrayList();
+        list.add(107);
+        list.add(108);
+        param.put("Ids", list);
+        param.put("listDbIds", list);
+        param.put("userId", 136);
+        if(listDbService.updateNodeListDb(param)){
+            System.out.println("成功");
+        }
+    }
+
+    @Test
+    public void findNodeListDbByNodeId() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("nodeId", 2800);
+        NodeListDb nodeListDb = listDbService.findNodeListDbByNodeId(param);
+        System.out.println(nodeListDb);
+
+    }
+
+    @Test
+    public void getSearchKeyIdListByNodeId() throws Exception {
+        String queryFields = listDbService.getSearchKeyIdListByNodeId("2263",136l);
+        System.out.println(queryFields);
+
+    }
+
+    @Test
+    public void findFieldsByListDbIds() throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>();
+        List list = new ArrayList();
+        list.add(107);
+        list.add(108);
+        param.put("listDbIds", list);
+        param.put("userId", 136);
+        String tb = listDbService.findFieldsByListDbIds(param);
+        System.out.println(tb);
+
+    }
+
+    @Test
+    public void createListDb() throws Exception {
+        ListDb listDb = new ListDb();
+        listDb.setListType("b");
+        listDb.setListName("黑名单--5");
+//        listDb.setTableColumn("565");
+        listDb.setStatus(0);
+        listDb.setUserId(136l);
+        String organId = "123";
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("organId", 42);
+        param.put("listType", "b");
+        param.put("tableColumn", "565");
+        param.put("queryField", "565");
+        if(listDbService.createListDb(listDb,param)){
+            System.out.println("成功");
+        }
+    }
+
+    @Test
+    public void findByQueryKey() throws Exception {
+        Long organId = 42l;
+        Long userId = 136l;
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("nodeId", "2667");
+        if(listDbService.findByQueryKey(param , userId , organId)){
+            System.out.println("成功");
+        }
+    }
+}

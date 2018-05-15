@@ -1,0 +1,13 @@
+## JDBC set
+#jdbc.url=jdbc:mysql://192.168.102.135:3306/rule_dev?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+jdbc.url=jdbc:mysql://36.33.216.230:3306/zw_rule_xiha?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+#jdbc.url=jdbc:mysql://101.200.43.66:3306/xiha_rule?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+#jdbc.username=root
+#jdbc.password=xhqb@wallet
+jdbc.username=zwjkhf
+jdbc.password=@WSX1qaz
+#jdbc.password=zwjkhf123
+jdbc.initialSize=2
+jdbc.minIdle=2
+jdbc.maxActive=4
+

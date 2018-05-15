@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.knowledge.KnowledgeTreeRelMapper">
+
+    <resultMap type="com.zw.rule.knowledge.po.KnowledgeTreeRel" id="knowledgeTreeRelMap">
+        <id column="id" property="id"/>
+        <result column="engine_id" property="engineId"/>
+        <result column="knowledge_tree_id" property="treeId"/>
+    </resultMap>
+
+    <sql id ="Base_Column">
+        id
+        engine_id as engineId,
+        knowledge_tree_id as treeId
+    </sql>
+
+    <insert id = "insertRel"   parameterType="map">
+        insert into zw_engine_knowledge_tree_link (engine_id,knowledge_tree_id)
+        values
+        <foreach collection="idList" index="index" item="item" separator=",">
+            (#{engineId},#{item})
+        </foreach>
+    </insert>
+
+    <delete id="deleteRel" parameterType="long">
+        delete from zw_engine_knowledge_tree_link where  engine_id =#{engineId}
+    </delete>
+
+    <select id ="findTreeIdsByEngineId" parameterType="long" resultType ="long">
+        select knowledge_tree_id from  zw_engine_knowledge_tree_link where engine_id =#{engineId}
+    </select>
+</mapper>

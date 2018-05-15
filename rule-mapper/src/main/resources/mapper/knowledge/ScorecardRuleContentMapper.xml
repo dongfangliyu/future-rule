@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.knowledge.ScorecardRuleContentMapper">
+
+    <resultMap type="com.zw.rule.knowledge.po.ScorecardRuleContent" id="ScorecardRuleContent">
+	     <id column="id" property="id"/>    
+	     <result column="cnName" property="cnName"/>
+	     <result column="field_id" property="fieldId"/> 
+	     <result column="field_value" property="fieldValue"/>
+	     <result column="scorecard_id" property="scorecardId"/>
+	     <result column="valueType" property="valueType"/>
+         <result column="restrainScope" property="restrainScope"/>
+    </resultMap>
+
+    <sql id ="Base_Column">
+        s.id ,
+        t.cn_name as cnName,
+        s.field_id as fieldId,
+        s.field_value as fieldValue,
+        s.scorecard_id as scorecardId,
+        t.en_name as enName,
+        t.value_type as valueType,
+        t.restrain_scope as restrainScope
+    </sql>
+    
+    <select id = "getRuleContentList" parameterType = "long" resultMap = "ScorecardRuleContent">
+        select  <include refid="Base_Column"/> from zw_scorecard_content s left join zw_field t on s.field_id = t.id where s.scorecard_id = #{id}
+    </select>
+    
+    <insert id = "insertRuleContent"   parameterType="java.util.List"> 
+        insert into zw_scorecard_content (field_id,field_value,scorecard_id)
+	    values
+	    <foreach collection="list" index="index" item="item" separator=",">
+	     ( #{item.fieldId},#{item.fieldValue},#{item.scorecardId})   
+	    </foreach>
+    </insert>
+    
+    <select id = "selectByPrimaryKey"  parameterType = "long"  resultMap="ScorecardRuleContent">
+      select <include refid="Base_Column"/> from zw_scorecard_content where id = #{id}
+    </select>
+    
+     <update id = "updateRuleContent"   parameterType="java.util.List" > 
+        <foreach collection="list" index="index" item="item"  separator=";" >
+	       update zw_scorecard_content set
+	       <if test ="item.fieldId != null">
+	        ,field_id = #{item.fieldId}   
+	       </if>
+	       <if test ="item.fieldValue != null">
+	        ,field_value = #{item.fieldValue}   
+	       </if>
+	        where id = #{item.id}
+       </foreach>
+    </update>
+    
+    <delete id="deleteRuleContent" parameterType="java.util.List">
+        <foreach collection="list" index="index" item="item"  separator=";" >
+           delete from zw_scorecard_content where id = #{item.id}
+        </foreach>
+    </delete>
+    <select id = "selectNodeByScCodeFieldList" parameterType = "nodeKnowledge" resultMap="ScorecardRuleContent">
+        select 
+        s.id ,
+        s.field_id as fieldId,
+        s.field_value as fieldValue,
+        s.scorecard_id as scorecardId from zw_scorecard_content s  WHERE s.scorecard_id IN( SELECT knowledge_id FROM zw_node_knowledge_link WHERE zw_node_knowledge_link.`node_id`=#{nodeId}
+         AND zw_node_knowledge_link.`knowledge_type`=#{knowledgeType})
+    </select>
+</mapper>

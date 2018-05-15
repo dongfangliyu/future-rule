@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.po.UserRole">
+    <resultMap type="com.zw.rule.po.UserRole" id="UserRole">
+        <result column="user_id" property="userId"/>
+        <result column="role_id" property="roleId"/>
+        <result column="org_id" property="orgId"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zw.rule.po.UserRole">
+        insert into zw_sys_user_role(user_id ,role_id
+        ,is_delete,create_by,create_time,update_by,update_time,remark)
+        values(#{userId},#{roleId},#{isDelete},#{createBy},#{createTime},#{updateBy},#{updateTime},#{remark})
+    </insert>
+
+    <select id="getListByUserId" resultMap="UserRole" parameterType="long">
+        select t.* from zw_sys_user_role t left join zw_sys_role r on t.role_id = r.role_id where t.is_delete = 0 and t.user_id = #{userId} and r.status = 1 and t.status = 1
+    </select>
+
+    <select id="getRoleIdsByUserId" resultType="String" parameterType="long">
+        select role_id from zw_sys_user_role where is_delete = 0 and user_id = #{userId} and status = 1
+    </select>
+
+    <delete id="deleteByUserId" parameterType="java.util.List">
+        <!--delete from zw_sys_user_role where is_delete = 0 and user_id = #{userId}-->
+        update zw_sys_user_role set status=-1
+        <where>
+            and is_delete = 0
+            <if test="list!=null and list.size()>0">
+                and  user_id in
+                <foreach collection="list" item="userId" index="index"
+                         open="(" separator="," close=")">#{userId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+    <delete id="deleteByOrgId" parameterType="java.util.List">
+        update zw_sys_user_role set status=-1
+        <where>
+            and is_delete = 0
+            <if test="list!=null and list.size()>0">
+                and  org_id in
+                <foreach collection="list" item="orgId" index="index"
+                         open="(" separator="," close=")">#{orgId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+</mapper>

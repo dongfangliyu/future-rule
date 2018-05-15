@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.engine.ResultSetListMapper">
+
+    <resultMap type="com.zw.rule.engine.po.ResultSetList" id="resultsetlistMap">
+        <id column="id" property="id"/>
+        <result column="type" property="type"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="remark" property="desc"/>
+        <result column="resultset_id" property="resultsetId"/>
+        <result column="expression" property="expression"/>
+
+    </resultMap>
+    <!-- 新增引擎并返回ID -->
+    <insert id="addResultSetList" parameterType="resultsetlist" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        zw_resultset_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null">
+                type,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="desc != null">
+                remark,
+            </if>
+            <if test="resultsetId != null">
+                resultsetId,
+            </if>
+            <if test="expression != null">
+                expression,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="code != null">
+                #{code},
+            </if>
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="desc != null">
+                #{desc},
+            </if>
+            <if test="resultsetId != null">
+                #{resultsetId},
+            </if>
+            <if test="expression != null">
+                #{expression},
+            </if>
+
+        </trim>
+    </insert>
+    <select id="queryResultSetListByResultsetId" parameterType="java.lang.Long" resultMap="resultsetlistMap" >
+        SELECT
+        *
+        FROM
+        zw_resultset_list
+        where
+        resultset_id=#{resultsetId}
+    </select>
+    <select id="queryResultSetListById" parameterType="resultsetlist" resultMap="resultsetlistMap">
+        select  * from zw_resultset_list where  id = #{id}
+    </select>
+
+
+    <insert id="insertResultSetListByList" parameterType="java.util.List">
+        insert into  zw_resultset_list (type,code,name,remark,resultset_id,expression) values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.type,jdbcType=INTEGER},#{item.code,jdbcType=VARCHAR},#{item.name,jdbcType=VARCHAR}
+            ,#{item.desc,jdbcType=VARCHAR}   ,#{item.resultsetId,jdbcType=INTEGER}  ,#{item.expression,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+</mapper>

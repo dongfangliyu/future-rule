@@ -1,0 +1,30 @@
+.Menu_Manager .add_menu td {
+    height: 50px;
+    line-height: 50px;
+    padding: 5px 0;
+}
+
+.Menu_Manager .add_menu td .btn-primary {
+    margin-left: 120px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+
+.Menu_Manager .add_menu td.label_name {
+    width: 60px;
+    color: #666
+}
+
+.Menu_Manager .add_menu select {
+    margin-left: 10px;
+    width: 100px;
+}
+
+
+.add_menu .radio {
+    float: left;
+    width: 100px;
+    margin-top: 6px
+}

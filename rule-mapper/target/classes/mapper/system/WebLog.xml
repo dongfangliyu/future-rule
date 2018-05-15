@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.po.WebLog">
+    <resultMap type="com.zw.rule.po.WebLog" id="WebLog">
+        <result column="web_log_id" property="webLogId"/>
+        <result column="login_account" property="loginAccount"/>
+        <result column="method" property="method"/>
+        <result column="method_desc" property="methodDesc"/>
+        <result column="method_args" property="methodArgs"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="operate_ip" property="operateIp"/>
+        <result column="status" property="status"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zw.rule.po.WebLog">
+        insert into zw_sys_web_log
+        (web_log_id,login_account,method,method_desc,method_args,operate_time,operate_ip,status,is_delete,create_by,create_time,update_by,update_time,remark)
+        values(#{webLogId}, #{loginAccount},#{method},#{methodDesc},#{methodArgs}, #{operateTime}, #{operateIp},#{status},#{isDelete},#{createBy},#{createTime},#{updateBy},#{updateTime},#{remark})
+    </insert>
+
+    <select id="getList" parameterType="java.util.Map" resultMap="WebLog">
+        select * from zw_sys_web_log
+        <where>
+            <if test="@Ognl@isNotEmpty(isDelete)">
+                is_delete = #{isDelete}
+            </if>
+            <if test="@Ognl@isNotEmpty(loginAccount)">
+                <!--and login_account = #{loginAccount}-->
+                and login_account like '%${loginAccount}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(operateTime)">
+                <!--<![CDATA[  and DATE_FORMAT(operate_time, '%Y-%m-%d') = #{operateTime}]]>-->
+                and operate_time like '%${operateTime}%'
+            </if>
+        </where>
+        order by create_time desc
+        <if test="@Ognl@isNotEmpty(page)">
+            limit #{page.firstIndex}, #{page.pageSize}
+        </if>
+    </select>
+
+    <select id="getCount"  parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from zw_sys_web_log
+        <where>
+            <if test="@Ognl@isNotEmpty(isDelete)">
+                is_delete = #{isDelete}
+            </if>
+            <if test="@Ognl@isNotEmpty(loginAccount)">
+                <!--and login_account = #{loginAccount}-->
+                and login_account like '%${loginAccount}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(operateTime)">
+                <!--<![CDATA[  and DATE_FORMAT(operate_time, '%Y-%m-%d') = #{operateTime}]]>-->
+                and operate_time like '%${operateTime}%'
+            </if>
+        </where>
+    </select>
+
+    <update id="update">
+        update zw_sys_web_log
+        <set>
+            <if test="@Ognl@isNotEmpty(remark)">
+                remark = #{remark},
+            </if>
+            <if test="@Ognl@isNotEmpty(status)">
+                status = #{status}
+            </if>
+        </set>
+        where web_log_id = #{webLogId}
+    </update>
+</mapper>

@@ -1,0 +1,689 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.datamanage.FieldMapper">
+
+    <resultMap type="com.zw.rule.datamanage.po.Field" id="field">
+        <id column="id" property="id"/>
+        <result column="en_name" property="enName"/>
+        <result column="cn_name" property="cnName"/>
+        <result column="field_type_id" property="fieldTypeId"/>
+        <result column="value_type" property="valueType"/>
+        <result column="restrain_scope" property="restrainScope"/>
+        <result column="is_derivative" property="isDerivative"/>
+        <result column="is_output" property="isOutput"/>
+        <result column="is_common" property="isCommon"/>
+        <result column="formula" property="formula"/>
+        <result column="formula_show" property="formulaShow"/>
+        <result column="protogene_field_id" property="protogeneFieldId"/>
+        <result column="derive_field_id" property="deriveFieldId"/>
+        <result column="creator" property="creator"/>
+        <result column="nickName" property="nickName"/>
+        <result column="create_time" property="createTime"/>
+
+        <result column="field_type" property="fieldType"/>
+        <result column="engine_id" property="engineId"/>
+        <result column="engineName" property="engineName"/>
+        <result column="status" property="status"/>
+        <result column="fieldRelId" property="fieldRelId"/>
+
+        <collection property="fieldCondList" ofType="fieldCond" column="id" select ="com.zw.rule.mapper.datamanage.FieldCondMapper.getFieldCondList"></collection>
+
+
+    </resultMap>
+
+    <select id="findByFieldType" parameterType="java.util.Map"  resultType="com.zw.rule.datamanage.po.Field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , p.field_type as fieldType
+        , f.value_type as valueType, f.restrain_scope as restrainScope
+        , f.is_derivative as isDerivative
+        , f.is_output as isOutput
+        , f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.creator, u.nick_name as nickName ,f.create_time as createTime
+        , r.status
+        from zw_field f, zw_field_user_link r, zw_field_type p, zw_sys_user u
+        where f.id = r.field_id and f.field_type_id = p.id and r.user_id = u.user_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="searchKey != null">
+            and f.en_name like '%${searchKey}%'
+        </if>
+        <if test="fieldTypeId == null and engineId == null and isCommon == 1 and status == null">
+            and r.engine_id is null
+            and f.is_common = 1
+            and r.status != -1
+        </if>
+        <if test="fieldTypeId != null and engineId == null and isCommon == 1 and status == null">
+            and f.field_type_id =  #{fieldTypeId}
+            and r.engine_id is null
+            and f.is_common = 1
+            and r.status != -1
+        </if>
+        <if test="fieldTypeId == null and engineId != null and isCommon == 0 and status == null">
+            and r.engine_id = #{engineId}
+            and r.status != -1
+        </if>
+        <if test="fieldTypeId == null and engineId != null and isCommon == 1 and status == 1">
+            and r.engine_id is null
+            and f.is_common = 1
+            and r.status = 1
+        </if>
+        <if test="fieldTypeId != null and engineId != null and isCommon == 1 and status == 1">
+            and f.field_type_id =  #{fieldTypeId}
+            and r.engine_id is null
+            and f.is_common = 1
+            and r.status = 1
+        </if>
+        <if test="fieldTypeId != null and engineId != null and isCommon == 0 and status == null">
+            and f.field_type_id =  #{fieldTypeId}
+            and r.engine_id = #{engineId}
+            and r.status != -1
+        </if>
+        <if test="fieldTypeId == null and engineId != null and isCommon == 0 and status == -1">
+            and r.engine_id = #{engineId}
+            and r.status = -1
+        </if>
+        order by f.create_time desc
+    </select>
+
+    <select id="searchByName" parameterType="java.util.Map"  resultType="com.zw.rule.datamanage.po.Field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , p.field_type as fieldType
+        , f.value_type as valueType, f.restrain_scope as restrainScope
+        , f.is_derivative as isDerivative
+        , f.is_output as isOutput
+        , f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.creator, u.nick_name as nickName ,f.create_time
+        , r.status
+        from zw_field f, zw_field_user_link r, zw_field_type p, zw_sys_user u
+        where f.id = r.field_id and f.field_type_id = p.id and r.user_id = u.user_id
+        <if test="searchKey != null">
+            and f.cn_name like '%${searchKey}%'
+        </if>
+        and r.status = 1
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+    </select>
+
+    <select id="findFieldTypeId" parameterType="java.util.Map"  resultType="long">
+        select distinct f.field_type_id as fieldTypeId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and r.field_id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findFieldTypeIdById" parameterType="java.util.Map"  resultType="long">
+        select distinct f.field_type_id as fieldTypeId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and r.field_id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findFieldTypeIdsByFieldId" parameterType="map"  resultType="String">
+        select group_concat(distinct(f.field_type_id)) as parentId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.engine_id = #{engineId}
+        and f.id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findByUser" parameterType="map"  resultType="com.zw.rule.datamanage.po.Field">
+        select   f.id
+        , r.id as fieldRelId
+        , f.en_name as enName
+        , f.cn_name as cnName
+        , f.field_type_id as fieldTypeId
+        , f.value_type as valueType
+        , f.restrain_scope as restrainScope
+        , p.field_type as fieldType
+        from zw_field f,zw_field_user_link r,zw_field_type p
+        where f.id = r.field_id
+        and f.field_type_id = p.id
+        and r.status = 1
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="searchKey != null">
+            and f.cn_name like '%${searchKey}%'
+        </if>
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        <if test="fieldId != null">
+            and f.id != #{fieldId}
+        </if>
+        <if test="valueType != null">
+            and f.value_type != #{valueType}
+        </if>
+
+    </select>
+
+    <select id="countByParams" parameterType="map" resultType="java.lang.Integer">
+        select count(f.id)
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        <if test="searchKey != null">
+            and f.en_name like '%${searchKey}%'
+        </if>
+        and f.field_type_id =  #{fieldTypeId}
+        and r.status = 1
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+    </select>
+
+    <select id="findByFieldId" parameterType="map"  resultMap="field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.protogene_field_id as protogeneFieldId, derive_field_id as deriveFieldId
+        , r.engine_id as engineId
+        , p.field_type as fieldType
+        from zw_field f,zw_field_user_link r,zw_field_type p
+        where f.id = r.field_id
+        and f.field_type_id = p.id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and f.id = #{id}
+
+    </select>
+    <select id="findByFieldIdbyorganId" parameterType="map"  resultMap="field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.protogene_field_id as protogeneFieldId, derive_field_id as deriveFieldId
+        , r.engine_id as engineId
+        , p.field_type as fieldType
+        from zw_field f,zw_field_user_link r,zw_field_type p
+        where f.id = r.field_id
+        and f.field_type_id = p.id
+        and r.org_id = #{orgId}
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and f.id = #{id}
+
+    </select>
+    <select id="findFieldByIds" parameterType="map"  resultMap="field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , r.engine_id as engineId
+        , f.protogene_field_id as protogeneFieldId
+        , p.field_type as fieldType
+        from zw_field f,zw_field_user_link r,zw_field_type p
+        where f.id = r.field_id
+        and f.field_type_id = p.id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="isDerivative != null">
+            and f.is_derivative = #{isDerivative}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        <choose>
+            <when test="Ids != null">
+                and f.id in
+                <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </when>
+            <otherwise>
+                and f.id = null
+            </otherwise>
+        </choose>
+
+    </select>
+    <select id="findFieldByIdsbyorganId" parameterType="map"  resultMap="field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , r.engine_id as engineId
+        , f.protogene_field_id as protogeneFieldId
+        , p.field_type as fieldType
+        from zw_field f,zw_field_user_link r,zw_field_type p
+        where f.id = r.field_id
+        and f.field_type_id = p.id
+        and r.org_id =  #{orgId}
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="isDerivative != null">
+            and f.is_derivative = #{isDerivative}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and f.id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="findFieldIdsByTypeIds" parameterType="map"  resultType="String">
+        select group_concat(f.id) as id
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.status in (0,1)
+        and r.engine_id = #{engineId}
+        and f.field_type_id in
+        <foreach collection="fieldTypeIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findFieldByIdsForCheckField" parameterType="map"  resultMap="field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , r.engine_id as engineId, e.name as engineName
+        , p.field_type as fieldType
+        from zw_field f,zw_field_type p
+        ,zw_field_user_link r left join zw_engine e on (r.engine_id = e.id)
+        where f.id = r.field_id
+        and f.field_type_id = p.id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and ( (f.is_common = 0 and r.engine_id is not null) or (f.is_common = 1 and r.engine_id is null) )
+        </if>
+        and f.id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <delete id="deleteField" parameterType="int">
+        DELETE FROM zw_field WHERE id = #{id}
+    </delete>
+
+    <select id="isExists" parameterType="map"  resultType="java.lang.Integer">
+        select count(f.id)
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        <if test="enName != null">
+            and f.en_name = #{enName}
+        </if>
+        <if test="cnName != null">
+            and f.cn_name = #{cnName}
+        </if>
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        <if test="Id != null">
+            and f.id != #{Id}
+        </if>
+    </select>
+
+    <select id="findByFieldName" parameterType="map"  resultType="com.zw.rule.datamanage.po.Field">
+        select f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and (f.en_name = #{enName} or f.cn_name = #{cnName})
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+
+    </select>
+
+    <insert id="createField" useGeneratedKeys="true" keyProperty="id" parameterType="com.zw.rule.datamanage.po.Field">
+        insert into zw_field (  en_name, cn_name, field_type_id
+        , value_type, restrain_scope, is_derivative
+        , is_output, formula, formula_show, protogene_field_id, derive_field_id
+        , is_common, creator, create_time)
+        values (  #{enName}, #{cnName}, #{fieldTypeId}
+        , #{valueType}, #{restrainScope}, #{isDerivative}
+        , #{isOutput}, #{formula}, #{formulaShow}, #{protogeneFieldId}, #{deriveFieldId}
+        , #{isCommon}, #{creator}, now() )
+    </insert>
+
+    <insert id="batchCreateField" parameterType="java.util.List">
+        insert into zw_field	( id,en_name, cn_name, field_type_id
+        , value_type, restrain_scope, is_derivative
+        , is_output, formula, formula_show, is_common, creator, create_time)
+        values
+        <foreach collection="list" item="field" index="index" separator=",">
+            (
+            #{field.id},#{field.enName}, #{field.cnName}, #{field.fieldTypeId}
+            , #{field.valueType}, #{field.restrainScope}, #{field.isDerivative}
+            , #{field.isOutput}, #{field.formula}, #{field.formulaShow}, #{field.isCommon}, #{field.creator}, now()
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateField" parameterType="map">
+        update zw_field
+        set   en_name = #{enName}, cn_name = #{cnName}, field_type_id = #{fieldTypeId}
+        , value_type = #{valueType}, restrain_scope = #{restrainScope}, is_derivative = #{isDerivative}
+        , is_output = #{isOutput}, formula = #{formula}, formula_show = #{formulaShow}
+        , protogene_field_id = #{protogeneFieldId}, derive_field_id = #{deriveFieldId}, is_common = #{isCommon}
+        where id = (select field_id
+        from zw_field_user_link
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and engine_id is null
+        </if>
+        and field_id = #{id}
+        )
+    </update>
+
+    <select id = "getFieldList" parameterType="map"  resultType="com.zw.rule.datamanage.po.Field">
+        select
+        t.id,
+        t.en_name as enName,
+        t.cn_name as cnName,
+        t.field_type_id as fieldTypeId,
+        t.value_type as valueType,
+        t.restrain_scope as restrainScope,
+        t.is_output as isOutput,
+        r.id as fieldRelId,
+        p.field_type as fieldType
+        from zw_field t LEFT JOIN zw_field_user_link r on t.id = r.field_id LEFT JOIN zw_field_type p on t.field_type_id = p.id where r.org_id = #{orgId} and status = 1
+        <if test="ids != null and ids !=''">
+            and t.id in (ids)
+        </if>
+        <if test="searchKey != null">
+            and t.cn_name like CONCAT('%',#{searchKey},'%' )
+        </if>
+        <if test="isOutput != null">
+            and t.is_output = #{isOutput}
+        </if>
+        <if test="engineId != null and  engineId!=''">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="valueType != null">
+            and t.value_type = #{valueType}
+        </if>
+        <if test="engineId == null or  engineId ==''">
+            and r.engine_id is null
+        </if>
+        <if test="folderId != null">
+            and t.field_type_id = #{folderId}
+        </if>
+    </select>
+
+    <select id="findByFieldEnbyorganId" parameterType="map"  resultMap="field">
+        select f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and f.en_name = #{enName}
+        and r.org_id = #{orgId}
+        and r.engine_id = #{engineId}
+        and r.status = 1
+    </select>
+
+    <select id="findByFieldEn" parameterType="map"  resultMap="field">
+        select f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and f.en_name = #{enName}
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.engine_id = #{engineId}
+        and r.status = 1
+    </select>
+
+    <select id="findByFieldCn" parameterType="map"  resultMap="field">
+        select f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.protogene_field_id as protogeneFieldId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and f.cn_name = #{cnName}
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and r.status = 1
+    </select>
+    <select id="findByFieldCnbyorganId" parameterType="map"  resultMap="field">
+        select f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.protogene_field_id as protogeneFieldId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and f.cn_name = #{cnName}
+        and r.org_id = #{orgId}
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and r.status = 1
+    </select>
+
+
+    <select id="checkField" parameterType="map"  resultType="String">
+        select group_concat(f.id) as ids
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.status = 1 and instr(f.derive_field_id,#{fieldId}) > 0
+    </select>
+
+    <select id="findByFieldCnNoEngineId" parameterType="map"  resultMap="field">
+        select f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.protogene_field_id as protogeneFieldId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and f.cn_name = #{cnName}
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.engine_id is null
+        and r.status = 1
+    </select>
+    <select id="findByFieldCnNoEngineIdbyorganId" parameterType="map"  resultMap="field">
+        select f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.protogene_field_id as protogeneFieldId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and f.cn_name = #{cnName}
+        and r.org_id = #{orgId}
+        and r.engine_id is null
+        and r.status = 1
+    </select>
+    <select id="findByFieldIdNoEngineId" parameterType="map"  resultMap="field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        , f.protogene_field_id as protogeneFieldId
+        , r.engine_id as engineId
+        , p.field_type as fieldType
+        from zw_field f,zw_field_user_link r,zw_field_type p
+        where f.id = r.field_id
+        and f.field_type_id = p.id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.engine_id is null
+        and f.id = #{id}
+    </select>
+
+    <select id="findFieldByIdsAndIsderivative" parameterType="map"  resultMap="field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId
+        , f.value_type as valueType, f.restrain_scope as restrainScope, f.is_derivative as isDerivative
+        , f.is_output as isOutput, f.is_common as isCommon, f.formula, f.formula_show as formulaShow
+        from zw_field f
+        where
+        is_derivative=#{isDerivative}
+        and f.id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findExcelByFieldType" parameterType="map"  resultType="com.zw.rule.datamanage.po.Field">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId,t.field_type as fieldType
+        , f.value_type as valueType
+        , f.restrain_scope as restrainScope
+        , f.is_derivative as isDerivative
+        ,f.is_common as isCommon
+        ,f.formula as formula
+        , f.is_output as isOutput
+        , f.formula, u.nick_name as nickName, f.create_time
+        from zw_field f,zw_field_user_link r,zw_field_type t,zw_sys_user u
+        where f.id = r.field_id
+        and f.field_type_id = t.id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and f.creator = u.user_id
+        <if test="searchKey != null">
+            and f.en_name like '%${searchKey}%'
+        </if>
+        <if test="fieldTypeId != null">
+            and f.field_type_id =  #{fieldTypeId}
+        </if>
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+
+    </select>
+
+    <select id="getSourceField" parameterType="map"  resultType="String">
+        select derive_field_id as deriveFieldId,protogene_field_id as protogeneFieldId
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and f.id = #{fieldId}
+        and r.engine_id is null
+    </select>
+
+    <select id="findOrgFieldTypeIdsByIds" parameterType="map"  resultType="String">
+        select group_concat(distinct(f.field_type_id))
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and f.id in
+        <foreach collection="fieldIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and r.engine_id is null
+    </select>
+
+    <select id="findOrgFieldIdsByTypeIds" parameterType="map"  resultType="String">
+        select group_concat(f.id) as id
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.status = 1
+        and f.field_type_id in
+        <foreach collection="fieldTypeIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and r.engine_id is null
+    </select>
+
+    <select id="selectFieldIdsByTypeIds" parameterType="map"  resultType="String">
+        select f.id as id
+        from zw_field f,zw_field_user_link r
+        where f.id = r.field_id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and r.status = 1
+        and f.field_type_id in
+        <foreach collection="fieldTypeIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and r.engine_id is null
+    </select>
+
+    <select id="findExcelByField" parameterType="map"  resultType="com.zw.rule.datamanage.po.FieldExcelOut">
+        select   f.id, f.en_name as enName, f.cn_name as cnName, f.field_type_id as fieldTypeId,t.field_type as fieldType
+        , f.value_type as valueType
+        , f.restrain_scope as restrainScope
+        , f.is_derivative as isDerivative
+        , f.is_common as isCommon
+        , f.formula as formula
+        , f.is_output as isOutput
+        , f.formula_show as formulaShow, f.derive_field_id as deriveFieldId,f.protogene_field_id as protogeneFieldId,f.creator as creator
+        , r.id as ulid,r.field_id as ulfieldId,r.org_id as ulorgId,r.engine_id as ulengineId,r.user_id as uluserId,r.status as ulstatus
+        from zw_field f,zw_field_user_link r,zw_field_type t,zw_sys_user u
+        where f.id = r.field_id
+        and f.field_type_id = t.id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and f.creator = u.user_id
+        <if test="fieldTypeId != null">
+            and f.field_type_id =  #{fieldTypeId}
+        </if>
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+    </select>
+
+</mapper>

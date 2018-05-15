@@ -1,0 +1,5 @@
+#url=http://127.0.0.1:9999/szt/dc/data
+url=http://127.0.0.1:8080/szt/dc/data
+act=query
+token=123456
+

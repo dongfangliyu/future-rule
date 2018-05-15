@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.rule.mapper.datamanage.FieldUserMapper">
+    <resultMap type="com.zw.rule.datamanage.po.FieldUser" id="fieldUserMap">
+        <id column="id" property="id"/>
+        <result column="field_id" property="fieldId"/>
+        <result column="org_id" property="orgId"/>
+        <result column="engine_id" property="engineId"/>
+        <result column="user_id" property="userId"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <insert id="createFieldUserRel" useGeneratedKeys="true" keyProperty="id" parameterType="com.zw.rule.datamanage.po.FieldUser">
+        insert into zw_field_user_link (field_id, org_id, engine_id, user_id, status, create_time, update_time)
+        values (#{fieldId}, #{orgId}, #{engineId}, #{userId}, #{status}, now(), now())
+    </insert>
+
+    <insert id="batchCreateFieldUserRel" parameterType="map">
+        insert into zw_field_user_link (field_id, org_id, engine_id, user_id, status, create_time, update_time)
+        select id, #{orgId}, #{engineId}, #{userId}, #{status}, now(), now()
+        from zw_field t
+        where t.creator = #{creator}
+        and not exists ( select r.field_id from zw_field_user_link r where t.id = r.field_id )
+    </insert>
+
+    <insert id="batchCreateEngineFieldUserRel" parameterType="map">
+        insert into zw_field_user_link (field_id, org_id, engine_id, user_id, status, create_time, update_time)
+        select id, #{orgId}, #{engineId}, #{userId}, #{status}, now(), now()
+        from zw_field f
+        where f.field_type_id in
+        <foreach collection="fieldTypeIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and not exists ( select 1
+        from (	select f.id,f.en_name,f.cn_name
+        from zw_field f,zw_field_user_link fu
+        where f.id = fu.field_id
+        and fu.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and fu.engine_id = ${engineId} )y
+        where f.en_name = y.en_name or f.cn_name = y.cn_name or f.id = y.id
+        )
+    </insert>
+
+    <insert id="batchBindEngineFieldUserRel" parameterType="map">
+        insert into zw_field_user_link (field_id, org_id, engine_id, user_id, status, create_time, update_time)
+        select id, #{orgId}, #{engineId}, #{userId}, 1, now(), now()
+        from zw_field f
+        where f.id in
+        <foreach collection="fieldIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and not exists ( select 1
+        from (	select f.id,f.en_name,f.cn_name
+        from zw_field f,zw_field_user_link fu
+        where f.id = fu.field_id
+        and fu.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and fu.engine_id = ${engineId} )y
+        where f.en_name = y.en_name or f.cn_name = y.cn_name or f.id = y.id
+        )
+    </insert>
+
+    <delete id="deleteEngineFieldUserRel" parameterType="map">
+        DELETE FROM zw_field_user_link where id in
+        <foreach collection="fieldUserIdsCom" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectEngineFieldUserRel" parameterType="map" resultType="Integer">
+        SELECT fu.id FROM zw_field_user_link as fu LEFT JOIN zw_field as f on fu.field_id = f.id where fu.engine_id = #{engineId} and f.is_common = 1
+    </select>
+
+    <insert id="engineFieldUserRel" parameterType="map">
+        INSERT INTO zw_field_user_link (field_id, org_id, engine_id, user_id, status, create_time, update_time) VALUES
+        <foreach collection="fieldIds" item="item" index="index" open="" separator="," close="" >
+            ( #{item}, #{orgId}, #{engineId}, #{userId}, 1, now(), now())
+        </foreach>
+    </insert>
+
+    <update id="updateFieldUserRel" parameterType="map">
+        update zw_field_user_link
+        set user_id = #{userId} , update_time = now()
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and engine_id is null
+        </if>
+        and field_id = #{Id}
+    </update>
+
+    <update id="updateStatus" parameterType="map">
+        update zw_field_user_link
+        set status=#{status}
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and engine_id = #{engineId}
+        </if>
+        <if test="engineId == null and status!=-1 and status!=0">
+            and engine_id is null
+        </if>
+        and field_id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <update id="deleteFieldByIds" parameterType="map">
+        update zw_field_user_link
+        set status = -1
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and engine_id = #{engineId}
+        and field_id in
+        <foreach collection="fieldIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and status = 1
+    </update>
+
+    <update id="backFieldByIds" parameterType="map">
+        update zw_field_user_link
+        set status = 1
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and engine_id = #{engineId}
+        and field_id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and status = -1
+    </update>
+
+    <insert id="batchCreateField" parameterType="java.util.List">
+        insert into zw_field	( en_name, cn_name, field_type_id
+        , value_type, restrain_scope, is_derivative
+        , is_output, formula, formula_show, is_common, creator, create_time)
+        values
+        <foreach collection="list" item="field" index="index" separator=",">
+            (
+            #{field.enName}, #{field.cnName}, #{field.fieldTypeId}
+            , #{field.valueType}, #{field.restrainScope}, #{field.isDerivative}
+            , #{field.isOutput}, #{field.formula}, #{field.formulaShow}, #{field.isCommon}, #{field.creator}, now()
+            )
+        </foreach>
+    </insert>
+
+</mapper>

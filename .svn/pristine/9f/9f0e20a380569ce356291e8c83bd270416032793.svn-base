@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.datamanage.NodeListDbMapper">
+
+    <resultMap type="com.zw.rule.datamanage.po.NodeListDb" id="nodeListDbMap">
+        <id column="id" property="id"/>
+        <result column="node_id" property="nodeId"/>
+        <result column="inside_listdbs" property="insideListdbs"/>
+        <result column="outside_listdbs" property="outsideListdbs"/>
+        <result column="engineId" property="engineId"/>
+        <result column="engineName" property="engineName"/>
+        <result column="nodeName" property="nodeName"/>
+    </resultMap>
+
+    <insert id="createNodeListDb" useGeneratedKeys="true" keyProperty="id" parameterType="map">
+        insert into zw_node_listdb_link (  node_id, inside_listdbs, outside_listdbs )
+        values (  #{nodeId}, #{insideListdbs}, #{outsideListdbs} )
+    </insert>
+
+    <insert id="insertNodeListDb" parameterType="nodeListDb">
+        insert into zw_node_listdb_link ( node_id, inside_listdbs, outside_listdbs )
+        values(#{nodeId}, #{insideListdbs},#{outsideListdbs})
+    </insert>
+
+    <select id="findDbListByNodeId" parameterType="long"  resultType="nodeListDb">
+        select node_id as nodeId, inside_listdbs as insideListdbs, outside_listdbs as outsideListdbs
+        from zw_node_listdb_link
+        where node_id = #{nodeId}
+    </select>
+
+    <select id="findByNodeId" parameterType="map"  resultType="nodeListDb">
+        select node_id as nodeId, inside_listdbs as insideListdbs, outside_listdbs as outsideListdbs
+        from zw_node_listdb_link
+        where node_id = #{nodeId}
+    </select>
+
+    <select id="checkByListDb" parameterType="map"  resultType="String">
+        select group_concat(en.node_id) as nodeId
+        from zw_node_listdb_link enr, zw_engine_node en, zw_engine_version ev, zw_engine e
+        where enr.node_id = en.node_id
+        and en.ver_id = ev.ver_id and ev.boot_state = 1
+        and ev.engine_id = e.id
+        <if test="engineId != null">
+            and e.id = #{engineId}
+        </if>
+        and (instr(enr.inside_listdbs,#{listDbId}) > 0 or instr(enr.outside_listdbs,#{listDbId}) > 0)
+    </select>
+
+    <select id="findByNodeIds" parameterType="map"  resultMap="nodeListDbMap">
+        select e.id as engineId, e.name as engineName
+        , en.node_id as nodeId, en.node_name as nodeName
+        from zw_node_listdb_link enr, zw_engine_node en, zw_engine_version ev, zw_engine e
+        where enr.node_id = en.node_id
+        and en.ver_id = ev.ver_id and ev.boot_state = 1
+        and ev.engine_id = e.id
+        <if test="engineId != null">
+            and e.id = #{engineId}
+        </if>
+        and en.node_id in
+        <foreach collection="nodeIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <delete id="deleteFieldRefByNodeId" parameterType="java.lang.Long">
+        delete from zw_node_listdb_link
+        where node_id = #{nodeId,jdbcType=INTEGER}
+    </delete>
+
+    <delete id = "deleteFieldRefsBatchByNodeIds" parameterType = "java.util.List">
+        <![CDATA[
+	       delete from zw_node_listdb_link where node_id in
+	    ]]>
+        <foreach collection="blackWhites" item = "item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="updateNodeListDb" parameterType="map">
+        update zw_node_listdb_link
+        set inside_listdbs = #{insideListdbs},  outside_listdbs = #{outsideListdbs}
+        where node_id = #{nodeId}
+    </update>
+
+    <select id="findByListDbName" parameterType="map"  resultType="java.lang.Integer">
+        select IFNULL(max(id),0) as id
+        from zw_list_db
+        where list_name = #{listName}
+        and list_type = #{listType}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </select>
+
+
+
+    <update id="createTable" parameterType="map">
+        ${sqlStr}
+    </update>
+
+    <update id="createIndex" parameterType="map">
+        ${indexSql}
+    </update>
+
+    <select id="findById" parameterType="map"  resultType="listDb">
+        select    id, list_type as listType, list_name as listName, data_source as dataSource, list_attribute as listAttribute, list_desc as listDesc
+        , table_column as tableColumn, match_type as matchType
+        , query_type as queryType, query_field as queryField, org_id as organId, status, user_id as userId, created
+        from zw_list_db
+        where id = #{id}
+        and list_type = #{listType}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </select>
+
+    <select id="findListDbById" parameterType="map" resultType="listDb">
+        select list_type as listType, query_field as queryField, match_type as matchType, query_type as queryType
+        from zw_list_db
+        where id = #{listDbId}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </select>
+
+    <update id="updateListDb" parameterType="map">
+        update zw_list_db
+        set list_type = #{listType}, list_name = #{listName}, data_source = #{dataSource}, list_attribute = #{listAttribute}, list_desc = #{listDesc}, maintenance = #{maintenance}
+        , match_type = #{matchType}, query_type = #{queryType}, query_field = #{queryField}
+        ,  user_id = #{userId}, created = now()
+        where id = #{id}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </update>
+
+</mapper>

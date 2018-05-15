@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+version '1.0'
+
+dependencies {
+    compile project(":common-tools")
+    compile project(":rule-model")
+
+    compile "org.mybatis:mybatis:${mybatis}"
+    compile "org.mybatis:mybatis-spring:${mybatisSpring}"
+    compile "org.springframework:spring-beans:${spring}"
+    compile "org.drools:knowledge-api:${knowledgeApi}"
+    compile "org.slf4j:slf4j-api:${slf4jApi}"
+    compile "commons-httpclient:commons-httpclient:${commonsHttpclient}"
+}
+
+jar {
+    baseName = 'rule-util'
+}
+

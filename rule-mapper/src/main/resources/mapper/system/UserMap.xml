@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.po.User">
+    <resultMap type="com.zw.rule.po.User" id="User">
+        <id property='userId' column='user_id' />
+        <result property='orgId' column='org_id' />
+        <result property='employeeId' column='employee_id' />
+        <result property='account' column='account' />
+        <result property='password' column='password' />
+        <result property='nickName' column='nick_name' />
+        <result property='email' column='email' />
+        <result property='tel' column='tel' />
+        <result property='qq' column='qq' />
+        <result property='latestTime' column='latest_time' />
+        <result property='latestIp' column='latest_ip' />
+        <result property='status' column='status' />
+        <result property='birth' column='birth' />
+        <result property='creator' column='creator' />
+
+        <result column="true_name" property="trueName"/>
+        <result column="sex" property="sex"/>
+        <result column="error_count" property="errorCount"/>
+        <result column="is_lock" property="isLock"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.zw.rule.po.User">
+        insert into zw_sys_user
+        (org_id, employee_id, account, password, true_name, nick_name, sex, email,
+        tel, qq, error_count, is_lock, latest_time, latest_ip, status, birth, creator,
+        is_delete, update_by, update_time, remark)
+        values(#{orgId}, #{employeeId}, #{account}, #{password}, #{trueName}, #{nickName}, #{sex}, #{email},
+        #{tel}, #{qq},#{errorCount},#{isLock},#{latestTime},#{latestIp}, #{status}, #{createTime}, #{creator},
+        #{isDelete},#{updateBy},#{updateTime},#{remark})
+    </insert>
+
+    <update id="updateUser" parameterType="java.util.Map">
+        update zw_sys_user set
+        account=#{account},password=#{password},tel=#{tel},email=#{email},true_name=#{trueName},nick_name=#{nickName},is_lock=#{isLock},status=#{status},update_time=#{updateTime},remark=#{remark}
+        where user_id=#{userId}
+    </update>
+
+    <update id="updateStatusByOrgId" parameterType="java.lang.Long">
+        update zw_sys_user set status=0,is_lock=0 where org_id=#{orgId}
+    </update>
+
+    <update id="updateLoginInfo" parameterType="java.util.Map">
+        update zw_sys_user set latest_time = #{latestTime} , latest_ip = #{latestIp} , error_count =
+        #{errorCount} where user_id = #{userId}
+    </update>
+
+    <update id="updateUserErrorCount" parameterType="java.util.Map">
+        update zw_sys_user set error_count = #{errorCount} , is_lock = #{isLock} where user_id =
+        #{userId}
+    </update>
+
+    <select id="getByUserId" parameterType="long" resultMap="User">
+        select * from zw_sys_user where user_id = #{userId}
+    </select>
+
+    <select id="getByAccount" parameterType="java.lang.String" resultMap="User">
+        select * from zw_sys_user where account = #{account} and status != -1
+    </select>
+
+    <select id="isExists" parameterType="java.util.Map" resultMap="User">
+        select * from zw_sys_user where account = #{account} and status != -1 and user_id != #{userId}
+    </select>
+
+    <select id="getList" resultType="Map" parameterType="java.util.Map">
+        select u.user_id as userId,o.name as organName, u.account as account ,u.true_name as trueName,u.status, u.is_lock as isLock ,
+        u.tel ,u.email ,u.birth as birth , u.update_time as updateTime ,u.latest_time as loginTime ,
+        u.latest_ip as loginIp ,
+        remark from zw_sys_user u left join zw_sys_organization o on u.org_id=o.org_id
+        <where>
+            u.status!=-1
+            <if test="@Ognl@isNotEmpty(isDelete)">
+               and u.is_delete = #{isDelete}
+            </if>
+            <if test="@Ognl@isNotEmpty(orgId)">
+                and  u.org_id=${orgId}
+            </if>
+            <if test="@Ognl@isNotEmpty(userId)">
+                and u.user_id like '%${userId}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(account)">
+                and u.account like '%${account}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(trueName)">
+                and u.true_name like '%${trueName}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(tel)">
+                and u.tel like '%${tel}%'
+            </if>
+        </where>
+        order by u.birth DESC
+        <if test="@Ognl@isNotEmpty(page)">
+            limit #{page.firstIndex}, #{page.pageSize}
+        </if>
+    </select>
+
+    <select id="getUserDetail" parameterType="long" resultType="Map">
+        select user_id as userId,org_id as orgId,status,account,password,tel,email,true_name as trueName,is_lock as
+        isLock,
+        remark from zw_sys_user where is_delete = 0 and user_id = #{userId}
+    </select>
+
+    <update id="updateDefaultPwd" parameterType="java.util.Map">
+        update zw_sys_user set password = #{defaultPwd} where user_id = #{userId}
+    </update>
+
+    <update id="updatePwd" parameterType="java.util.Map">
+        update zw_sys_user set password = #{newPassword} where user_id = #{userId}
+    </update>
+
+    <delete id="deleteByUserId" parameterType="java.util.List">
+        <!--delete from zw_sys_user where is_delete = 0 and user_id = #{userId}-->
+        update zw_sys_user set status=-1
+        <where>
+               and is_delete = 0
+            <if test="list!=null and list.size()>0">
+                and  user_id in
+                <foreach collection="list" item="userId" index="index"
+                         open="(" separator="," close=")">#{userId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+    <delete id="deleteByOrgId" parameterType="java.util.List">
+        update zw_sys_user set status=-1
+        <where>
+            and is_delete = 0
+            <if test="list!=null and list.size()>0">
+                and org_id in
+                <foreach collection="list" item="orgId" index="index"
+                         open="(" separator="," close=")">#{orgId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+     <select id="getPermission" parameterType="java.lang.String" resultType="java.lang.String" >
+    	select m.url from zw_sys_user u
+		left join zw_sys_user_role ur on u.user_id = ur.user_id
+		left join zw_sys_role_menu rm on ur.role_id = rm.role_id
+		left join zw_sys_menu m on rm.menu_id = m.menu_id
+		where u.account = #{account} and m.url is not null and m.url !='' and m.status!='-1' and rm.is_delete='0'
+    </select>
+
+     <select id="getAllPermission" parameterType="java.lang.String" resultType="java.lang.String" >
+    	select m.url from zw_sys_user u
+		left join zw_sys_user_role ur on u.user_id = ur.user_id
+		left join zw_sys_role_menu rm on ur.role_id = rm.role_id
+		left join zw_sys_menu m on rm.menu_id = m.menu_id
+		where m.url is not null and m.url !='' and m.status!='-1' and rm.is_delete='0'
+    </select>
+
+    <select id="getCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(*) from zw_sys_user
+        <where>
+            status != -1
+            <if test="@Ognl@isNotEmpty(isDelete)">
+                is_delete = #{isDelete}
+            </if>
+            <if test="@Ognl@isNotEmpty(userId)">
+                and user_id like '%${userId}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(account)">
+                and account like '%${account}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(trueName)">
+                and true_name like '%${trueName}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(tel)">
+                and tel like '%${tel}%'
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,67 @@
+body{
+    overflow: hidden;
+}
+.index_style {
+    padding: 20px;
+}
+
+.index_style .frame {
+    position: relative;
+    padding: 25px;
+    border: 1px solid #ddd;
+    background-color: #FFF;
+    margin: 25px 0 0 0;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+.index_style .frame .title_name {
+    position: absolute;
+    top: -44px;
+    font-size: 22px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-bottom-color: #ffffff;
+    padding: 5px 20px;
+    border-radius: 15px 15px 0 0;
+    -moz-border-radius: 15px 15px 0 0;
+    -webkit-border-radius: 15px 15px 0 0;
+    left: -1px;
+}
+
+.index_style .frame .content {
+
+}
+
+.index_style .frame .content .xj_list li {
+    float: left;
+    width: 30%;
+    height: 40px;
+    line-height: 40px;
+}
+
+.index_style .frame .content .xj_list li .label_name {
+    width: 100px;
+    float: left;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.index_style .frame .content .xj_list li .xinxi {
+    float: left
+}
+
+.index_style .frame .content .xj_list li .xinxi b {
+    color: #F60;
+    padding: 0 10px;
+}
+
+.Manager_style .title_name {
+    position: absolute;
+    top: -20px;
+    font-size: 18px;
+    background-color: #ffffff;
+    padding: 10px 20px;
+    left: 10px;
+}

@@ -1,0 +1,60 @@
+package datamanager;
+
+import com.zw.rule.mapper.datamanage.FieldMapper;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.zw.rule.datamanage.po.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * <strong>Title : <br>
+ * </strong> <strong>Description : </strong>@类注释说明写在此处@<br>
+ * <strong>Create on : 2017年05月04日<br>
+ * </strong>
+ * <p>
+ * <strong>Copyright (C) zw.<br>
+ * </strong>
+ * <p>
+ *
+ * @author department:技术开发部 <br>
+ *         username:Administrator <br>
+ *         email: <br>
+ * @version <strong>zw有限公司-运营平台</strong><br>
+ *          <br>
+ *          <strong>修改历史:</strong><br>
+ *          修改人 修改日期 修改描述<br>
+ *          -------------------------------------------<br>
+ *          <br>
+ *          <br>
+ */
+public class FieldMapperTest {
+    //加载配置文件
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+    //创建mapper对象
+    private FieldMapper fieldMapper;
+
+    @Before
+    public void MapperTest() throws Exception {
+        fieldMapper = cxt.getBean(FieldMapper.class);//实例化mapper对象
+    }
+
+    @Test
+    public void test() {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", "130");
+        param.put("fieldTypeId","1");
+        param.put("engine_id","1");
+        param.put("searchKey","test");
+        int a  = fieldMapper.countByParams(param);
+        System.out.println(a);
+//        for (int i = 0; i < list.size(); i++) {
+//            System.out.println(list.get(i).toString());
+//        }
+    }
+}
+

@@ -1,0 +1,28 @@
+package knowledge;
+
+import com.zw.rule.datamanage.service.FieldService;
+import com.zw.rule.knowledge.po.RuleField;
+import com.zw.rule.knowledge.service.EngineRuleRelService;
+import com.zw.rule.knowledge.service.RuleFieldService;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by Administrator on 2017/5/11 0011.
+ */
+public class RuleFieldServiceTest {
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+    @Test
+    public void getFieldListTest() throws Exception {
+        RuleFieldService ruleFieldService = (RuleFieldService) cxt.getBean("ruleFieldServiceImpl");
+
+        ruleFieldService.findById(1l);
+//        for (int i = 0; i < list.size(); i++) {
+//            System.out.println(list.get(i).toString());
+//        }
+    }
+}

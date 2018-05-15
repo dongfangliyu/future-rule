@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.knowledge.ScorecardMapper">
+
+    <resultMap type="com.zw.rule.knowledge.po.Scorecard" id="Scorecard">
+	     <id column="id" property="id"/>    
+	     <result column="name" property="name"/> 
+	     <result column="code" property="code"/>
+	     <result column="remark" property="desc"/>
+	     <result column="version" property="version"/>  
+	     <result column="parent_id" property="parentId"/>    
+	     <result column="user_id" property="userId"/>
+	     <result column="creator" property="creator"/>
+	     <result column="authorName" property="authorName"/>
+	     <result column="org_id" property="orgId"/>
+	     <result column="engine_id" property="engineId"/>
+	     <result column="status" property="status"/>
+	     <result column="type" property="type"/>
+	     <result column="score" property="score"/>
+	     <result column="pd" property="pd"/>
+	     <result column="odds" property="odds"/>
+	     <result column="create_time" property="createTime"/>
+	     <result column="update_time" property="updateTime"/>
+	     <result column="engineName" property="engineName"/>
+	     <collection property="sFieldList" ofType="scorecardField"  column="id"  select ="com.zw.rule.mapper.knowledge.ScorecardFieldMapper.queryFieldList"></collection>
+	     <collection property="sContentList"  ofType="scorecardRuleContent" column="id"   select = "com.zw.rule.mapper.knowledge.ScorecardRuleContentMapper.getRuleContentList"></collection>
+    </resultMap>
+
+    <sql id ="Base_Column">
+        s.id,
+        s.name,   
+        s.code,
+        s.remark,
+        s.version,
+	    s.parent_id as parentId,    
+	    s.user_id as userId,
+	    s.creator,
+	    u.nick_name as authorName,
+	    s.org_id as orgId,
+	    s.engine_id as engineId,
+	    s.status,
+	    s.type,
+	    s.score,
+	    s.pd,
+	    s.odds,
+	    s.create_time as createTime,
+	    s.update_time as updateTime
+    </sql>
+    
+    <select id = "getScorecardList" parameterType="Map"  resultMap="Scorecard">
+           select 
+           <include refid="Base_Column"/>
+           from zw_scorecard  s left join zw_sys_user u on s.creator = u.user_id
+           where  engine_id = #{engineId}
+            <if test ="parentIds != null">  
+              and s.parent_id  in      
+		      <foreach collection="parentIds" index="index" item="item"  open="(" separator="," close=")">
+			     #{item}
+			  </foreach> 
+           </if>
+          <if test ="status != null">
+             and s.status in 
+	        <foreach collection="status" index="index" item="item"  open="(" separator="," close=")">
+		         #{item}
+		    </foreach>
+          </if>  
+          <if test ="orgId != null">
+               and s.org_id = #{orgId}
+          </if> 
+         <if test ="type != null">
+               and s.type = #{type}
+         </if>     
+         <if test="scorecardName!=null">
+			   and s.name like CONCAT('%',#{scorecardName},'%' )
+		 </if>
+		 order by s.create_time desc
+    </select>
+    
+    <insert id = "insertSelective"   parameterType="scorecard" useGeneratedKeys="true" keyProperty="id"> 
+        insert into zw_scorecard (    
+        name,   
+        code,
+		remark,
+        version,
+        parent_id,
+        user_id,
+        creator,
+        <if test ="orgId !=null">
+        org_id,
+        </if>
+        <if test ="engineId!=null">
+        engine_id,
+        </if>
+        <if test ="score!=null">
+        score,
+        </if>
+        <if test ="pd!=null">
+         pd,
+        </if>
+        <if test ="odds!=null">
+        odds,
+        </if>
+        status,type,create_time,update_time)
+	    values( 
+		    #{name},
+			#{code},
+	        #{desc},
+	        #{version},
+		    #{parentId},
+		    #{userId},
+		    #{creator},
+		    <if test ="orgId !=null">
+		    #{orgId},
+		    </if>
+		    <if test ="engineId!=null">
+		    #{engineId},
+		    </if>
+		    <if test ="score!=null">
+		    #{score},
+		    </if>
+		    <if test ="pd !=null">
+		    #{pd},
+		    </if>
+		    <if test ="odds !=null">
+		    #{odds},
+		    </if>
+		    #{status},#{type},now(), now()
+		   )        
+    </insert>
+
+    <update id = "updateByPrimaryKeySelective"   parameterType="scorecard" > 
+       update zw_scorecard set
+       <if test ="name != null">
+       name = #{name},   
+       </if>
+       <if test ="code != null">
+       code = #{code},
+       </if>
+       <if test ="desc != null">
+		 remark = #{desc},
+       </if>
+       <if test ="version != null">
+        version  = #{version},
+       </if>
+       <if test ="status != null">
+	    status = #{status},
+	   </if>
+	   <if test = "type != null">
+	    type = #{type},
+	   </if>
+	   <if test = "userId != null">
+	    user_id = #{userId},
+	   </if>
+	  	<if test ="score!=null">
+	    score= #{score},
+	    </if>
+    	<if test ="pd!=null">
+	    pd = #{pd},
+	    </if>
+	    <if test ="odds!=null">
+	    odds = #{odds},
+	    </if>
+	   update_time = now() where id = #{id}
+    </update>
+    
+    <update id = "updateScorecardStatus"  parameterType = "Map">
+       update zw_scorecard set
+		<if test ="status == 1 and parentId !=null">
+			parent_id = #{parentId},
+		</if>
+		status = #{status}
+		where id in
+        <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+    
+    <select id = "selectByPrimaryKey"  parameterType = "long" resultMap = "Scorecard">
+       select <include refid = "Base_Column"/> from zw_scorecard  s left join zw_sys_user u on s.creator = u.user_id where s.id = #{id}
+    </select>
+    
+    <select id = "checkByField"   resultMap = "Scorecard">
+       select s.id,s.name,s.engine_id,e.name as engineName
+         from zw_scorecard s left join zw_engine e on (e.id = s.engine_id)
+        where s.status = 1 
+        	  <if test="engineId != null">
+               and s.engine_id = #{engineId}
+               </if>
+		      and exists (select 1 from zw_scorecard_content c 
+		                  where s.id = c.scorecard_id 
+		                        and c.field_id in 
+                                 <foreach collection="fieldIds" item="item" index="index" open="(" separator="," close=")">  
+              	                  #{item}
+              	                 </foreach>
+              	          )
+    </select>
+    
+   <select id="countOnlyScName"  parameterType = "map" resultType = "int">
+        select count(name) from  zw_scorecard  where engine_id = #{engineId} and name = TRIM(#{name})
+        <if test="id !=null">
+         and id != #{id}
+        </if>
+    </select>
+    
+    <select id="countOnlyScCode" parameterType = "map" resultType = "int">
+        select count(code) from  zw_scorecard  where engine_id = #{engineId} and  code=TRIM(#{code})
+        <if test="id !=null">
+         and  id != #{id}
+        </if>
+    </select>
+    <select id = "selectNodeByScCodeList" parameterType = "nodeKnowledge" resultType="Scorecard">
+      select s.id,
+        s.name,   
+        s.code,
+        s.remark,
+        s.version,
+	    s.parent_id as parentId,    
+	    s.user_id as userId,
+	    s.creator,	 
+	    s.org_id as orgId,
+	    s.engine_id as engineId,
+	    s.status,
+	    s.type,
+	    s.score,
+	    s.pd,
+	    s.odds,
+	    s.create_time,
+	    s.update_time  from zw_scorecard s  WHERE s.id IN( SELECT knowledge_id FROM zw_node_knowledge_link WHERE zw_node_knowledge_link.`node_id`=#{nodeId} 
+         AND zw_node_knowledge_link.`knowledge_type`=#{knowledgeType}) 
+    </select>
+</mapper>

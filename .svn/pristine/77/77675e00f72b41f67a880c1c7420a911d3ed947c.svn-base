@@ -1,0 +1,12 @@
+rootProject.name = 'rule-app'
+include 'rule-web'
+include 'rule-engine'
+include 'common-tools'
+include 'rule-service'
+include 'rule-model'
+include 'rule-mapper'
+include 'dubbo-base'
+include 'task-base'
+include 'dao-base'
+include 'rule-util'
+

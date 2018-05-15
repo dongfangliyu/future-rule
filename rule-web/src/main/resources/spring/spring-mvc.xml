@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    	http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!-- 自动扫描controller包下的所有类，使其认为spring mvc的控制器 -->
+    <!-- 启用spring mvc 注解 -->
+    <context:annotation-config/>
+    <aop:aspectj-autoproxy/>
+    <!--<context:component-scan base-package="com.zw.web.base.aop"/>-->
+    <!-- 设置使用注解的类所在的jar包 -->
+    <context:component-scan base-package="com.zw.**.controller" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!--Controller方法中抛出异常的处理-->
+    <bean id="exceptionHandler" class="com.zw.rule.web.interceptor.AppExceptionHandler"/>
+
+    <!-- 对模型视图名称的解析，即在模型视图名称添加前后缀 -->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:prefix="/WEB-INF/pages/"
+          p:suffix=".jsp"/>
+
+    <!-- 	如果使用了<mvc:annotation-driven />(这个是使用requestbody和responseBody必须使用的标签)， 它会自动注册DefaultAnnotationHandlerMapping 与AnnotationMethodHandlerAdapter 这两个bean -->
+    <mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/plain;charset=UTF-8</value>
+                        <value>text/xml;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+            <bean class="org.springframework.http.converter.FormHttpMessageConverter"/>
+            <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>image/jpeg</value>
+                    </list>
+                </property>
+            </bean>
+            <bean id="mappingJacksonHttpMessageConverter"
+                  class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <!-- 解决 HttpMediaTypeNotAcceptableException: Could not find acceptable representation -->
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- REST中根据URL后缀自动判定Content-Type及相应的View -->
+    <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+        <property name="favorPathExtension" value="false"/>
+        <property name="favorParameter" value="true"/>
+        <property name="mediaTypes">
+            <map>
+                <entry key="atom" value="application/atom+xml"/>
+                <entry key="html" value="text/html"/>
+                <entry key="json" value="application/json"/>
+                <entry key="xml" value="application/xml"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- <bean id="threadLocalInterceptor" class="com.zw.web.base.interceptor.ThreadLocalInterceptor"></bean>
+     <bean id="loginValidateInterceptor" class="com.zw.web.base.interceptor.LoginInterceptor">
+     </bean>
+     <mvc:interceptors>
+         <mvc:interceptor>
+             <mvc:mapping path="/"/>
+             <mvc:mapping path="/*"/>
+             <mvc:mapping path="/**"/>
+             <mvc:exclude-mapping path="/resources/**"/>
+             <ref bean="threadLocalInterceptor"/>
+         </mvc:interceptor>
+         <mvc:interceptor>
+             <mvc:mapping path="/**"/>
+             <mvc:exclude-mapping path="/"/>
+             <mvc:exclude-mapping path="/AssistApply/**"/>
+             <mvc:exclude-mapping path="/appscanning"/>
+             <mvc:exclude-mapping path="/uxmyaccount/notic"/>
+             <mvc:exclude-mapping path="/login/**"/>
+             <mvc:exclude-mapping path="/reg/**"/>
+             <mvc:exclude-mapping path="/forgetPw/**"/>
+             <mvc:exclude-mapping path="/resetPw/**"/>
+             <mvc:exclude-mapping path="/resources/**"/>
+             <mvc:exclude-mapping path="/comm/**"/>
+             <ref bean="loginValidateInterceptor"/>
+         </mvc:interceptor>
+     </mvc:interceptors>-->
+
+    <!-- 对springMVC中进行上传下载功能实现 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+          p:defaultEncoding="UTF-8"/>
+
+    <!-- 对js引用的设置 -->
+    <mvc:resources location="/resources/" mapping="/resources/**" cache-period="31556926"/>
+    <mvc:default-servlet-handler/>
+
+    <mvc:view-controller path="/" view-name="login"/>
+
+    <!-- 读入配置属性文件 -->
+    <context:property-placeholder
+            ignore-unresolvable="true"
+            file-encoding="UTF-8"
+            location="classpath*:/properties/*.properties"/>
+</beans>

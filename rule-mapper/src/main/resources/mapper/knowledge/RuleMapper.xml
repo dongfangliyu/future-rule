@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.zw.rule.mapper.knowledge.RuleMapper">
+
+    <resultMap type="com.zw.rule.knowledge.po.Rule" id="ruleMap">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="remark" property="desc"/>
+        <result column="priority" property="priority"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="user_id" property="userId"/>
+        <result column="creator" property="creator"/>
+        <result column="authorName" property="authorName"/>
+        <result column="org_id" property="orgId"/>
+        <result column="engine_id" property="engineId"/>
+        <result column="status" property="status"/>
+        <result column="type" property="type"/>
+        <result column="is_negation" property="isNegation"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="rule_type" property="ruleType"/>
+        <result column="rule_audit" property="ruleAudit"/>
+        <result column="score" property="score"/>
+        <result column="last_logical" property="lastLogical"/>
+        <result column="engineName" property="engineName"/>
+        <result column="content" property="content"/>
+        <collection property="ruleFieldList" ofType="ruleField"  column="id"  select ="com.zw.rule.mapper.knowledge.RuleFieldMapper.getFieldList"></collection>
+        <collection property="ruleContentList"  ofType="ruleContent" column="id"   select = "com.zw.rule.mapper.knowledge.RuleContentMapper.getRuleContentList"></collection>
+    </resultMap>
+
+    <sql id ="Base_Column">
+        r.id,
+        r.name,
+        r.code,
+        r.remark,
+        r.priority,
+        r.parent_id as parentId,
+        r.user_id as userId,
+        r.creator,
+        u.nick_name as authorName,
+        r.org_id as orgId,
+        r.engine_id as engineId,
+        r.status,
+        r.rule_audit as ruleAudit,
+        r.type,
+        r.score,
+        r.last_logical as lastLogical,
+        r.is_negation as isNegation,
+        r.create_time,
+        r.update_time,
+        r.rule_type,
+        r.content
+    </sql>
+
+    <sql id ="Base_Column_1">
+        r.id,
+        r.name,
+        r.code,
+        r.remark,
+        r.priority,
+        r.parent_id as parentId,
+        r.user_id as userId,
+        r.creator,
+        u.nick_name as authorName,
+        r.org_id as orgId,
+        r.engine_id as engineId,
+        (CASE r. STATUS
+        WHEN r.id IN (
+        SELECT
+        rule_id
+        FROM
+        zw_engine_rule_link td
+        WHERE
+        engine_id =#{engineId}
+        ) THEN
+        1
+        ELSE
+        0
+        END) AS status,
+        r.rule_audit as ruleAudit,
+        r.type,
+        r.score,
+        r.last_logical as lastLogical,
+        r.is_negation as isNegation,
+        r.create_time,
+        r.update_time,
+        r.rule_type,
+        r.content
+    </sql>
+
+
+    <sql id ="Base_Column_2">
+        r.id,
+        r.name,
+        r.code,
+        r.remark,
+        r.engine_id,
+        r.priority,
+        r.parent_id,
+        r.user_id,
+        r.creator,
+        r.org_id,
+        r.engine_id,
+        r.status,
+        r.type,
+        r.is_non,
+        r.rule_audit,
+        r.score,
+        r.last_logical,
+        r.create_time,
+        r.update_time,
+        r.rule_type
+    </sql>
+
+    <select id = "getRuleList" parameterType="java.util.Map"  resultMap="ruleMap">
+        <if test ="type == 2">
+            select * from (
+        </if>
+        select
+        <include refid="Base_Column"/>
+        from zw_rule r left join zw_sys_user u on r.creator = u.user_id
+        where 1=1
+        <if test ="parentIds != null">
+            and r.parent_id  in
+            <foreach collection="parentIds" index="index" item="item"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test ="status != null">
+            and r.status in
+            <foreach collection="status" index="index" item="item"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="ruleName != null">
+            and r.name like CONCAT('%',#{ruleName},'%' )
+        </if>
+        <if test="orgId != null">
+            and r.org_id = #{orgId}
+        </if>
+        <if test ="type == 0">
+            and r.type = 0
+        </if>
+        <if test ="type == 1">
+            and r.type = 1
+            order by create_time desc
+        </if>
+        <if test ="type == 2">
+            and r.engine_id = #{engineId}
+            and r.type = 2
+            union
+            select
+            <choose>
+                <when test = "engineId!='' and engineId!=null">
+                    <include refid="Base_Column_1"/>
+                </when>
+                <otherwise>
+                    <include refid="Base_Column"/>
+                </otherwise>
+            </choose> from
+            zw_rule r left join zw_sys_user u on r.creator = u.user_id
+            where 1=1
+            <if test ="parentIds != null ">
+                and r.parent_id  in
+                <foreach collection="parentIds" index="index" item="item"  open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test ="status != null">
+                and r.status in
+                <foreach collection="status" index="index" item="item"  open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            and r.org_id = #{orgId}
+            <if test="ruleName != null">
+                and r.name like CONCAT('%',#{ruleName},'%' )
+            </if>
+            and r.type = 1
+            and r.id in (select rule_id from zw_engine_rule_link td where engine_id = #{engineId})
+            order by create_time desc
+            ) y
+        </if>
+    </select>
+
+    <select id = "getRuleIdsByParentId" parameterType="Map"  resultType="long">
+        select id from zw_rule r left join zw_sys_user u on r.creator = u.user_id
+        where 1=1 and r.status = 1
+        <if test ="parentIds != null">
+            and r.parent_id in
+            <foreach collection="parentIds" index="index" item="item"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <insert id = "insertSelective"   parameterType="rule" useGeneratedKeys="true" keyProperty="id">
+        insert into zw_rule (
+        name,
+        code,
+        remark,
+        priority,
+        parent_id,
+        user_id,
+        creator,
+        <if test ="content !=null">
+            content,
+        </if>
+        <if test ="orgId !=null">
+            org_id,
+        </if>
+        <if test ="engineId!=null">
+            engine_id,
+        </if>
+        <if test ="ruleAudit!=null">
+            rule_audit,
+        </if>
+        <if test ="score!=null">
+            score,
+        </if>
+        <if test ="lastLogical!=null">
+            last_logical,
+        </if>
+        status,type,is_negation,create_time,update_time,rule_type)
+        values(
+        #{name},
+        #{code},
+        #{desc},
+        #{priority},
+        #{parentId},
+        #{userId},
+        #{creator},
+        <if test ="content !=null">
+            #{content},
+        </if>
+        <if test ="orgId !=null">
+            #{orgId},
+        </if>
+        <if test ="engineId!=null">
+            #{engineId},
+        </if>
+        <if test ="ruleAudit!=null">
+            #{ruleAudit},
+        </if>
+        <if test ="score!=null">
+            #{score},
+        </if>
+        <if test ="lastLogical!=null">
+            #{lastLogical},
+        </if>
+        #{status},#{type},#{isNegation},now(), now(),#{ruleType}
+        )
+    </insert>
+
+    <update id = "updateByPrimaryKeySelective"   parameterType="rule" >
+        update zw_rule set
+        <if test ="name != null">
+            name = #{name},
+        </if>
+        <if test ="code != null">
+            code = #{code},
+        </if>
+        <if test ="content != null">
+            content = #{content},
+        </if>
+        <if test ="desc != null">
+            remark = #{desc},
+        </if>
+        <if test ="priority != null">
+            priority = #{priority},
+        </if>
+        <if test ="status != null">
+            status = #{status},
+        </if>
+        <if test = "type != null">
+            type = #{type},
+        </if>
+        <if test = "isNegation != null">
+            is_negation = #{isNegation},
+        </if>
+        <if test = "ruleType != null">
+            rule_type = #{ruleType},
+        </if>
+        <if test ="ruleAudit!=null">
+            rule_audit =  #{ruleAudit},
+        </if>
+        score = #{score},
+        <if test ="lastLogical!=null">
+            last_logical = #{lastLogical},
+        </if>
+        update_time = now() where id = #{id}
+    </update>
+
+    <update id = "updateRuleStatus"  parameterType="Map" >
+        update zw_rule set
+        <if test ="status == 1 and parentId !=null">
+            parent_id = #{parentId},
+        </if>
+        status = #{status} , update_time = now()
+        where id in
+        <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id = "selectByPrimaryKey"  parameterType = "long" resultMap = "ruleMap">
+        select <include refid = "Base_Column"/>  from zw_rule r left join zw_sys_user u on r.creator = u.user_id where r.id = #{id}
+    </select>
+
+    <select id = "selectByInRoleid"   resultMap = "ruleMap">
+        select <include refid = "Base_Column"/>  from zw_rule
+        id in
+        <foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id = "getNodeByRuleList"  parameterType = "nodeKnowledge" resultMap = "ruleMap">
+        select <include refid = "Base_Column"/>  from zw_rule r WHERE zw_rule.id IN( SELECT knowledge_id FROM zw_node_knowledge_link WHERE zw_node_knowledge_link.`node_id`=#{id}
+        AND zw_node_knowledge_link.`knowledge_type`=#{knowledge_type}
+    </select>
+
+    <select id = "selectnodeByInRoleid"   resultMap = "ruleMap">
+        select  r.id,
+        r.name,
+        r.code,
+        r.remark,
+        r.priority,
+        r.parent_id as parentId,
+        r.user_id as userId,
+        r.creator,
+        r.org_id as orgId,
+        r.engine_id as engineId,
+        r.status,
+        r.rule_audit as ruleAudit,
+        r.type,
+        r.score,
+        r.content,
+        r.last_logical as lastLogical,
+        r.is_negation as isNegation,
+        r.create_time,
+        r.update_time,
+        r.rule_type   from zw_rule r
+        where r.id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        ORDER BY priority ASC
+    </select>
+
+    <select id = "checkByField"  parameterType = "map" resultMap = "ruleMap">
+        select r.id,r.name,r.engine_id as engineId,e.name as engineName
+        from (
+        select id,name,engine_id
+        from zw_rule
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and engine_id = #{engineId}
+        </if>
+        and status = 1
+        union all
+        select r.id,r.name,er.engine_id
+        from zw_engine_rule_link er left join zw_node_knowledge_link nr on er.rule_id = nr.knowledge_id left join zw_rule r on nr.knowledge_id = r.id
+        where r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and er.engine_id = #{engineId}
+        </if>
+        and r.status = 1
+        )r left join zw_engine e on r.engine_id = e.id
+        where (exists (select 1 from (select rule_id, left(field_id,LOCATE('|',field_id)-1) as f from zw_rule_field) rf
+        where r.id = rf.rule_id
+        and rf.f in
+        <foreach collection="fieldIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )
+        or exists (select 1 from (select rule_id, left(field_id,LOCATE('|',field_id)-1) as f from zw_rule_content) rc
+        where r.id = rc.rule_id
+        and rc.f in
+        <foreach collection="fieldIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        )
+        )
+
+    </select>
+
+    <select id="countOnlyRuleName"  parameterType = "map" resultType = "int">
+        select count(name) from  zw_rule  where org_id = #{orgId} and name = TRIM(#{name}) and status != -1
+        <if test="id !=null and id!=''">
+            and  id != #{id}
+        </if>
+    </select>
+
+    <select id="countOnlyRuleCode" parameterType = "map" resultType = "int">
+        select count(code) from  zw_rule  where org_id = #{orgId} and  code=TRIM(#{code}) and status != -1
+        <if test="id !=null and id!=''">
+            and id != #{id}
+        </if>
+    </select>
+
+    <select id="getFieldIdsByRuleId"  parameterType ="java.util.List"  resultType = "string">
+        select field_id from  zw_rule_field  where rule_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        union
+        select field_id from  zw_rule_content  where rule_id in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="getRuleListByType"  parameterType ="map"  resultMap = "ruleMap">
+        select
+        <include refid = "Base_Column_2"/>
+        from  zw_rule r
+        where r.parent_id = #{parentId}
+        <if test="type != 2">
+            and r.rule_type = #{type}
+        </if>
+        <choose>
+            <when test="ids != null">
+                and r.id in
+                <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+                or r.engine_id = #{engineId}
+            </when>
+            <otherwise>
+                and r.engine_id = #{engineId}
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id = "getNodeAddOrSubRulesByNodeId" parameterType="Long"  resultMap="ruleMap">
+        select
+        r.id,
+        r.name,
+        r.code,
+        r.remark,
+        r.priority,
+        r.parent_id as parentId,
+        r.user_id as userId,
+        r.creator,
+        r.org_id as organId,
+        r.engine_id as engineId,
+        r.status,
+        r.rule_audit as ruleAudit,
+        r.type,
+        r.score,
+        r.content,
+        r.last_logical as lastLogical,
+        r.is_negation as isNegation,
+        r.create_time,
+        r.update_time,
+        r.rule_type
+        from zw_node_knowledge_rel n left join zw_rule r
+        on r.id = n.knowledge_id where n.node_id = #{nodeId} and n.knowledge_type = 1
+        and r.rule_type = 1
+    </select>
+
+    <delete id="deleteRelateRule" parameterType="long">
+        delete from zw_node_rule_link where node_id = #{nodeId}
+    </delete>
+
+    <insert id="saveRuleNode" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+        insert into zw_node_rule_link (node_id,rule_id,priority,create_time) values (#{nodeId},#{ruleId},#{priority},now())
+    </insert>
+
+    <select id="selectRulesByNodeId" parameterType="long" resultMap="ruleMap">
+        select r.id,r.name,r.code,r.remark,n.priority,r.parent_id as parentId,
+        r.user_id as userId,r.creator,r.org_id as organId,r.engine_id as engineId,
+        r.status,r.rule_audit as ruleAudit,r.type,r.score,r.content,
+        r.last_logical as lastLogical,r.is_negation as isNegation,
+        r.create_time,r.update_time,r.rule_type from zw_node_rule_link n left join zw_rule r on n.rule_id = r.id
+        where n.node_id = #{nodeId}
+        order by n.priority ASC
+    </select>
+
+    <select id="selectRuleNodeByNodeId" parameterType="long" resultType="com.zw.rule.knowledge.po.RuleNode">
+        SELECT id , node_id AS nodeId , rule_id AS ruleId , priority FROM zw_node_rule_link WHERE node_id = #{nodeId}
+    </select>
+
+    <insert id="saveVerRuleNode" parameterType="com.zw.rule.knowledge.po.RuleNode" useGeneratedKeys="true" keyProperty="id">
+        insert into zw_node_rule_link (node_id,rule_id,priority,create_time) values (#{nodeId},#{ruleId},#{priority},now())
+    </insert>
+
+</mapper>

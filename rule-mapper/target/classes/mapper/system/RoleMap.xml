@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.po.Role">
+    <resultMap type="com.zw.rule.po.Role" id="Role">
+        <result column="role_id" property="roleId"/>
+        <result column="role_name" property="roleName"/>
+        <result column="org_id" property="orgId"/>
+        <result column="sign" property="sign"/>
+        <result column="role_code" property="roleCode"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="author" property="author"/>
+        <result column="birth" property="birth"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="role_desc" property="roleDesc"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <insert id="addRole">
+        insert into
+        zw_sys_role(role_id,role_name,role_code,status,author,birth,update_by,update_time,role_desc,org_id)
+        values(#{roleId},#{roleName},#{roleCode},#{status},#{createBy},#{createTime},#{updateBy},#{updateTime},#{roleDesc},#{orgId})
+    </insert>
+
+    <select id="getRoleList" resultMap="Role">
+        select * from zw_sys_role
+        <where>
+            <if test="@Ognl@isNotEmpty(status)">
+                and status in(0,1)
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                and role_id like '%${roleId}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(roleCode)">
+                and role_code like '%${roleCode}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(roleName)">
+                and role_name like '%${roleName}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(orgId)">
+                and org_id=${orgId}
+            </if>
+        </where>
+        order by birth desc
+        <if test="@Ognl@isNotEmpty(page)">
+            limit #{page.firstIndex}, #{page.pageSize}
+        </if>
+
+    </select>
+
+    <select id="getRoleIdAndName" resultType="Map" parameterType="java.util.Map" >
+        select role_id as roleId ,role_name from zw_sys_role where status = 1 and (org_id =(select org_id from zw_sys_user where  user_id=#{userId})
+        <if test="@Ognl@isNotEmpty(userId)">
+            or  1=1
+        </if>
+        )
+    </select>
+
+    <select id="getRoleDetail" resultType="Map">
+        select role_id as roleId ,role_code,role_name,role_desc from zw_sys_role where role_id = #{roleId} and
+        status = 0
+    </select>
+
+    <select id="getRoleNameByRoleId" parameterType="java.lang.String" resultType="String">
+        select role_name from zw_sys_role where role_id = #{roleId}
+    </select>
+
+    <select id="getRoleBySignAndNoRoleId" parameterType="java.util.Map" resultMap="Role">
+        select * from zw_sys_role where role_code = #{roleCode} and role_id != #{roleId} and status != 1
+    </select>
+
+    <select id="getRoleBySign" parameterType="java.util.Map" resultMap="Role">
+        select * from zw_sys_role where  role_code = #{roleCode} AND  org_id=#{orgId} and status != 1
+    </select>
+
+    <update id="updateRole" parameterType="java.util.Map">
+        update zw_sys_role set role_name=#{roleName},role_code=#{roleCode},update_time=#{updateTime},role_desc=#{roleDesc},status=#{status}
+        where role_id=#{roleId}
+    </update>
+
+    <update id="updateStatusByOrgId" parameterType="java.lang.Long">
+        update zw_sys_role set status=0 where org_id=#{orgId}
+    </update>
+
+    <select id="getRoleByRoleId" parameterType="java.lang.String" resultMap="Role">
+        select * from zw_sys_role where role_id =#{roleId} AND status = 1
+    </select>
+
+    <select id="getRoleById" parameterType="java.lang.String" resultMap="Role">
+        select * from zw_sys_role where role_id =#{roleId}
+    </select>
+
+    <select id="getRoleIdByOrgId" parameterType="java.util.List" resultType="String">
+        select role_id as roleId from zw_sys_role
+        <where>
+            <if test="list!=null and list.size()>0">
+                org_id in
+                <foreach collection="list" item="orgId" index="index"
+                         open="(" separator="," close=")">#{orgId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getCount" parameterType="java.util.Map" resultType="Integer">
+        select count(*) from zw_sys_role
+        <where>
+            <if test="@Ognl@isNotEmpty(status)">
+                and status in (0,1)
+            </if>
+            <if test="@Ognl@isNotEmpty(roleId)">
+                and role_id like '%${roleId}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(roleCode)">
+                and role_code like '%${roleCode}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(name)">
+                and role_name like '%${name}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(orgId)">
+                and org_id=${orgId}
+            </if>
+        </where>
+    </select>
+
+    <delete id="deleteByRoleId" parameterType="java.util.List">
+        update zw_sys_role set status=-1
+        <where>
+            and is_delete = 0
+            <if test="list!=null and list.size()>0">
+                and  role_id in
+                <foreach collection="list" item="roleId" index="index"
+                         open="(" separator="," close=")">#{roleId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+    <delete id="deleteByOrgId" parameterType="java.util.List">
+        update zw_sys_role set status=-1
+        <where>
+            and is_delete = 0
+            <if test="list!=null and list.size()>0">
+                and  org_id in
+                <foreach collection="list" item="orgId" index="index"
+                         open="(" separator="," close=")">#{orgId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+</mapper>

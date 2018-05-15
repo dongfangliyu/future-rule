@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.engine.NodeKnowledgeMapper">
+
+  <resultMap id="NodeKnowledge" type="com.zw.rule.engine.po.NodeKnowledge">
+    <id column="rel_id" jdbcType="INTEGER" property="relId" />
+    <result column="node_id" jdbcType="INTEGER" property="nodeId" />
+    <result column="knowledge_id" jdbcType="INTEGER" property="knowledgeId" />
+    <result column="knowledge_type" jdbcType="INTEGER" property="knowledgeType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    rel_id, node_id, knowledge_id,knowledge_type
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="long" resultMap="NodeKnowledge">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_node_knowledge_link
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectByNodeId" parameterType="long" resultMap="NodeKnowledge">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_node_knowledge_link
+    where node_id = #{nodeId,jdbcType=INTEGER} and knowledge_type = #{knowledgeType,jdbcType=INTEGER}
+  </select>
+  	
+  <delete id = "deleteKnowledgesBatchByNodeIds" parameterType = "java.util.List">  
+	    <![CDATA[  
+	       delete from zw_node_knowledge_link where node_id in  
+	    ]]>  
+	    <foreach collection="knowledges" item = "item" open="(" separator="," close=")">
+	    	#{item} 
+	    </foreach>  
+  </delete>
+  
+  <select id="findScorecardByNodeId" parameterType="java.lang.Long" resultMap="NodeKnowledge">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_node_knowledge_link
+    where node_id = #{nodeId,jdbcType=INTEGER}
+    and knowledge_type = 2
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="long">
+    delete from zw_node_knowledge_link
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteKnowledgesByNodeId" parameterType="java.util.Map">
+    delete from zw_node_knowledge_link
+    where node_id = #{nodeId,jdbcType=INTEGER}
+    <if test="type != 0">
+       and knowledge_type = #{type,jdbcType=INTEGER}
+    </if>
+  </delete>
+  
+  <insert id="insertNode" parameterType="com.zw.rule.engine.po.NodeKnowledge">
+  	insert into zw_node_knowledge_link (node_id, knowledge_id, knowledge_type)
+  	values(#{nodeId}, #{knowledgeId}, #{knowledgeType})
+  </insert>
+  
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into zw_node_knowledge_link (node_id, knowledge_id,knowledge_type)
+    values 
+    <foreach collection="list" index="index" item="item"  separator="," >
+       (#{item.nodeId,jdbcType=INTEGER}, #{item.knowledgeId,jdbcType=INTEGER},#{item.knowledgeType,jdbcType=INTEGER})
+    </foreach>
+  </insert>
+
+  <insert id="insertSelective" parameterType="nodeKnowledge">
+    insert into zw_node_knowledge_link
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="relId != null">
+        rel_id,
+      </if>
+      <if test="nodeId != null">
+        node_id,
+      </if>
+      <if test="knowledgeId != null">
+        knowledge_id,
+      </if>
+      <if test="knowledgeType != null">
+        knowledge_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="relId != null">
+        #{relId,jdbcType=INTEGER},
+      </if>
+      <if test="nodeId != null">
+        #{nodeId,jdbcType=INTEGER},
+      </if>
+      <if test="knowledgeId != null">
+        #{knowledgeId,jdbcType=INTEGER},
+      </if>
+      <if test="knowledgeType != null">
+        #{knowledgeType,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+ 
+  <update id="updateByPrimaryKeySelective" parameterType="nodeKnowledge">
+    update zw_node_knowledge_link
+    <set>
+      <if test="nodeId != null">
+        node_id = #{nodeId,jdbcType=INTEGER},
+      </if>
+      <if test="knowledgeId != null">
+        knowledge_id = #{knowledgeId,jdbcType=INTEGER},
+      </if>
+      <if test="knowledgeType != null">
+        knowledge_type = #{knowledgeType,jdbcType=INTEGER},
+      </if>
+    </set>
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="nodeKnowledge">
+    update zw_node_knowledge_link
+    set node_id = #{nodeId,jdbcType=INTEGER},
+      knowledge_id = #{knowledgeId,jdbcType=INTEGER},
+      knowledge_type = #{knowledgeType,jdbcType=INTEGER}
+    where rel_id = #{relId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="queryNodeKnowledgeListByNodeId" parameterType="map" resultMap="NodeKnowledge">
+     select  <include refid="Base_Column_List"/>  from zw_node_knowledge_link where  node_id = #{nodeId} and knowledge_type = #{type}
+  </select>
+  
+  <delete id="batchDeleteNodeKnowledge" parameterType="java.util.List">
+      <foreach collection="list" index="index" item="item"  separator=";" >
+           delete from zw_node_knowledge_link where node_id = #{item.nodeId} and knowledge_type = #{item.knowledgeType}
+      </foreach>
+  </delete>
+  
+  <select id="queryEnginesByRuleId" parameterType="map" resultType="engine" >
+      select distinct e.* from 
+      zw_node_knowledge_link r left join zw_engine_node n on r.node_id = n.node_id  
+      left join zw_engine_version v on n.ver_id = v.ver_id left join  zw_engine e on v.engine_id = e.id
+      where r.knowledge_type = #{type} and r.knowledge_id in 
+      <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+	      #{item}       
+	  </foreach>
+	  <if test ="engineId !=null and engineId !=''">
+	     and e.id =#{engineId}
+	  </if>
+  </select>
+  
+  <select id="queryScorecardList" parameterType="map" resultType="scorecard">
+		SELECT
+			s.*
+		FROM
+            zw_scorecard s
+		LEFT JOIN zw_node_knowledge_link r ON s.id = r.knowledge_id
+		LEFT JOIN zw_engine_node n ON r.node_id = n.node_id
+		WHERE n.ver_id = #{verId} and r.knowledge_type =2  and n.node_id in
+	    <foreach collection="idList" index="index" item="item" open="(" separator="," close=")">
+	        #{item}       
+	    </foreach>
+  </select>
+</mapper>

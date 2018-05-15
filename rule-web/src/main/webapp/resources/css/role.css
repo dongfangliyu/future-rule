@@ -1,0 +1,24 @@
+.role_Manager_style .add_role_style {
+    margin: 10px;
+}
+
+.role_Manager_style .add_role_style li .label_name, .role_Manager_style .add_role_style .Remark .label_name {
+    float: left;
+    width: 70px;
+    text-align: right;
+}
+
+.role_Manager_style .add_role_style li {
+    float: left;
+    height: 40px;
+    margin: 5px;
+    line-height: 52px;
+    width: 255px;
+}
+
+.select{
+    float:right;
+    width:163px;}
+.role_Manager_style .add_role_style ul {
+    margin: 0;
+}

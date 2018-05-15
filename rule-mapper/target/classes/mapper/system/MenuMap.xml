@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.po.Menu">
+    <resultMap type="com.zw.rule.po.Menu" id="Menu">
+        <result column="menu_id" property="menuId"/>
+        <result column="name" property="name"/>
+        <result column="url" property="url"/>
+        <result column="type" property="type"/>
+        <result column="icon" property="icon"/>
+        <result column="is_show" property="isShow"/>
+        <result column="seq" property="seq"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="parent_name" property="parentName"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+
+        <result column="code" property="code"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <insert id="add" parameterType="com.zw.rule.po.Menu">
+        insert into zw_sys_menu
+        (menu_id,name,url,type,icon,is_show,parent_id,parent_name,is_delete,create_by,create_time,update_by,update_time,remark,code)
+        values(#{menuId}, #{name}, #{url},#{type}, #{icon}, #{isShow}, #{parentId},
+        #{parentName},#{isDelete},#{createBy},#{createTime},#{updateBy},#{updateTime},#{remark},#{code})
+    </insert>
+
+    <update id="update" parameterType="com.zw.rule.po.Menu">
+        update zw_sys_menu set
+        name=#{name},url=#{url},type=#{type},is_show=#{isShow},icon=#{icon},remark=#{remark},code=#{code}
+        where menu_id = #{menuId}
+    </update>
+
+    <select id="getMenuList" parameterType="java.util.Map" resultMap="Menu">
+        select distinct(r1.menu_id) as menuId, r1.name ,r1.parent_id as parentId , r1.url , r1.type,
+        r1.create_time as createTime, r1.update_time as updateTime, r1.remark ,r1.is_show as isShow
+        ,r1.parent_name as parentName
+        from zw_sys_menu as r1
+        left join zw_sys_menu as r2 on r2.menu_id = r1.parent_id
+        <where>
+            status = 1
+            <if test="@Ognl@isNotEmpty(isDelete)">
+                and is_delete = #{isDelete}
+            </if>
+            <if test="@Ognl@isNotEmpty(menuId)">
+                and r1.menu_id like '%${menuId}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(name)">
+                and r1.name like '%${name}%'
+            </if>
+        </where>
+    </select>
+
+    <select id="getMenuIdAndName" parameterType="java.lang.String" resultType="Map">
+        select menu_id as menuId ,name from zw_sys_menu where is_delete = 0 and status = 1 and
+        parent_id=#{parentId}
+    </select>
+
+    <select id="getParentIds" resultType="List">
+        select menu_id from zw_sys_menu where parent_id = "#" and is_delete = 0 and status = 1
+    </select>
+
+    <select id="getMenuById" parameterType="java.lang.String" resultMap="Menu">
+        select * from zw_sys_menu where menu_id = #{menuId} and is_delete= 0 and status = 1
+    </select>
+
+    <select id="getCount" parameterType="java.util.Map" resultType="Integer">
+        select count(*) from zw_sys_menu
+        <where>
+            status = 1
+            <if test="@Ognl@isNotEmpty(isDelete)">
+                is_delete = #{isDelete}
+            </if>
+            <if test="@Ognl@isNotEmpty(menuId)">
+                and menu_id like '%${menuId}%'
+            </if>
+            <if test="@Ognl@isNotEmpty(name)">
+                and name like '%${name}%'
+            </if>
+        </where>
+        <if test="@Ognl@isNotEmpty(page)">
+            limit #{page.firstIndex}, #{page.pageSize}
+        </if>
+    </select>
+
+    <select id="getMenuByParentId" parameterType="java.lang.String" resultMap="Menu">
+        select * from zw_sys_menu where is_delete = 0 and status = 1 and parent_id=#{menuId}
+    </select>
+
+    <select id="getMenuTree" parameterType="java.lang.String" resultType="Map">
+        select DISTINCT(t1.menu_id) as menuId,t1.parent_id as parentId ,t1.name ,t1.icon,t3.menu_id as
+        selectedId
+        from zw_sys_menu t1 left join zw_sys_menu t2 on t1.parent_id = t2.menu_id
+        left join sys_role_menu t3 on t1.menu_id = t3.menu_id
+        and t3.role_id= #{roleId} where t1.status = 1 and t2.status = 1
+    </select>
+
+    <select id="getAllMenuTree" parameterType="java.lang.String" resultType="Map">
+        select DISTINCT(t1.menu_id) as id,t1.parent_id as parent ,t1.name as text ,t1.icon,
+        case when t1.type='1' then 'file' when t1.type='0' then 'default' END 'type'
+        from zw_sys_menu t1 left join zw_sys_menu t2 on t1.parent_id = t2.menu_id where t1.status = 1
+    </select>
+
+    <select id="getMenuByAccount" parameterType="java.lang.String" resultMap="Menu">
+        select * from zw_sys_menu where menu_id in(
+        select menu_id from sys_role where role_id in (
+        select role_id from sys_user_role where user_id=(select user_id from sys_user where account
+        =#{account}))
+        ) and status = 1
+    </select>
+
+    <delete id="deleteByMenuId" parameterType="java.lang.String">
+        <!--delete from zw_sys_menu where is_delete = 0 and menu_id = #{menuId}-->
+        update zw_sys_menu set status = -1 where menu_id = #{menuId}
+    </delete>
+    <delete id="deleteByParentId" parameterType="java.lang.String">
+        <!--delete from zw_sys_menu where is_delete = 0 and parent_id = #{menuId}-->
+        update zw_sys_menu set status = -1 where parent_id = #{menuId}
+    </delete>
+
+</mapper>

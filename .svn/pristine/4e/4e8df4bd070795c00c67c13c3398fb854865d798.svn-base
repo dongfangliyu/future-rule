@@ -1,0 +1,255 @@
+/****规则集******/
+#ruls_list_info{
+    display: none!important;
+}
+.page_jump{display: none!important;}
+#myTabContent{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #eee;
+}
+.c-policy-preview-span{
+    text-align: left;
+}
+.preview-span{
+    float: right;
+}
+.c-reject-lfet{
+    margin: 1em 0;
+    text-align: left;
+    position: absolute;
+    top:20%
+}
+.left-priority{
+    float:left;
+}
+.c-reject-lfet .c-refuse-rule{
+    float: left;
+    margin-right: 2em;
+}
+#refuse-rule{
+    float: right;
+    width:70%;
+    overflow: auto;
+    max-height: 100px;
+}
+.c-policy-priority{
+    line-height: 20px;
+    display: none;
+}
+.l_checkbox{
+    display: inline-block;
+    vertical-align: middle;
+    float: left;
+    width: 15px;
+    height: 15px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+
+#showRul .dataTables_wrapper .dataTables_paginate{
+    float:left;
+    font-size: .5em;
+}
+#showRuls .dataTables_wrapper .dataTables_paginate{
+    font-size: .5em;
+}
+.c-tier-two{
+    padding:1em 0;
+    border-top: 1px solid #ddd;
+    position: relative;
+}
+.c-subtract-left{
+    text-align: left;
+    float: left;
+    clear: both;
+}
+.c-subtract-right{
+    margin:.2em 0;
+}
+.c-deduction{
+    display: inline-block;
+}
+.checkbox_input{
+    vertical-align: top;
+}
+#priorityList li{
+    margin:.5em;
+    cursor: pointer;
+    display: inline-block;
+}
+#priorityList li label{
+    cursor: pointer;
+}
+
+/******决策选项*****/
+#myTabContent1{
+    border-bottom: none;
+}
+#ser-value{
+    overflow: hidden;
+}
+.c-variable-add{
+    text-align: left;
+    margin-left: 1.5em;
+    float: left;
+}
+.l_selects{
+    margin-left:36px;
+}
+#d-option-out{
+    float: left;
+    margin-left: 1.5em;
+    clear: both;
+}
+#myTab{
+    overflow: hidden;
+}
+#myTab .c-decision-switcher{
+    float:left;
+}
+#d-option-2,#d-option-3{
+    display: none;
+}
+#d-option-1 #myTabContent{
+    position: relative;
+}
+.c-operation-inclusion{
+    float: left;
+    position: relative;
+    top: 8px;
+    display: inline-block;
+}
+.c-field-return{
+    float: right;
+}
+.c-optional-rules{
+    display: inline-block;
+}
+.c-repetition{
+    text-align: left;
+}
+.c-operational-character,.c-operational-characterTwo{
+    display: inline-block;
+}
+.decision-TabControl-head{
+    margin:1em auto;
+}
+#myTab1 div.c-decision-switcher:first-child,#myTab2 div.c-decision-switcher:first-child{
+    float: left;
+    width: 50%;
+    cursor: pointer;
+}
+a{
+    text-decoration: none!important;
+}
+.c-front-portion-head{
+    display: block;
+    height: 100px;
+    width: 100%;
+    border: 1px solid #ddd;
+}
+.c-first-line .c-option-a{
+    text-align: left;
+    float: left;
+}
+#decision_regionTwo .c-decision_region{
+    overflow: hidden;
+}
+#decision_regionTwo .c-first-line{
+    float: left;
+}
+#decision_regionTwo .c-next-line{
+    float: right;
+}
+#des-b .c-section-left{
+    float: left;
+}
+#des-b .c-option-d{
+    float: left;
+}
+.c-next-line .c-queen-portion-head{
+    overflow: hidden;
+    padding: 1em 0;
+    border: 1px solid #ddd;
+}
+.c-option-c{
+    padding: 1em 0;
+    text-align: left;
+    border: 1px solid #ddd;
+    border-top: 0;
+    width: 1001%;
+}
+.c-next-line .c-queen-portion-head{
+    width: 1001%;
+}
+.c-queen-portion .c-option-e{
+    display: inline-block;
+}
+input[name=result]{
+    margin-left: 16px;
+}
+.c-queen-portion{
+    padding: 1em 0;
+    border-bottom: 1px solid #ddd;
+}
+.c-option-a .c-front-portion{
+    padding: 1em;
+    padding-top: 5px;
+    border: 1px solid #ddd;
+    border-top: 0;
+}
+.includeFormula{
+    width: 100%!important;
+    height: 175px;
+    border: 1px solid #ddd;
+    margin: 1em auto;
+    margin-top:0;
+}
+.c-field-operator-head{
+    background: #ddd;
+    padding: .5em 0;
+}
+img{
+    cursor: pointer;
+}
+.c-operator-hide{
+    display: none;
+}
+.c-operational-character,.c-operational-characterTwo{
+    margin:0 1em;
+}
+.field-bounced-table table{
+    margin:1em 0;
+    width:100%
+}
+.field-bounced-table table td{
+    width:30%;
+    text-align: center;
+}
+.field-bounced-first{
+    overflow: hidden;
+    margin: 1em 0;
+}
+.c-bounced-grid{
+    float: left;
+    width: 30%;
+    text-align: center;
+}
+.field-bounced-content .field-bounced-first .c-bounced-grid input{
+    width:90px!important;
+    margin-left: 30px;
+}
+.field-bounced-first .c-bounced-grid:nth-child(2) input{
+    margin-left: 40px;
+}
+.field-bounced-first .c-bounced-grid:last-child{
+    position: relative;
+    top: 4px;
+    left: 40px;
+}
+.c-inclusion{
+    overflow: auto;
+    min-height: 40px
+}

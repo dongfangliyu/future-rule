@@ -1,0 +1,30 @@
+package datamanager;
+
+import com.zw.rule.datamanage.po.FieldType;
+import com.zw.rule.mapper.datamanage.FieldTypeMapper;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Administrator on 2017/5/4.
+ */
+public class FieldTypeMapperTest {
+    //加载配置文件
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+
+    @Test
+    public void fieldTypeTest() {
+        FieldTypeMapper fieldTypeMapper = cxt.getBean(FieldTypeMapper.class);
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", "136");
+        List<FieldType> list = fieldTypeMapper.queryFieldTypeList(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).getFieldType());
+        }
+    }
+}

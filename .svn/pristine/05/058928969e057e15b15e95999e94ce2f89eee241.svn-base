@@ -1,0 +1,30 @@
+package knowledge;
+
+import com.zw.rule.mapper.knowledge.ScorecardFieldMapper;
+import com.zw.rule.mapper.knowledge.ScorecardMapper;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Created by Administrator on 2017/5/11 0011.
+ */
+public class ScorecardMapperTest {
+    //加载配置文件
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+    @Test
+    public void getFieldListTest() {
+        ScorecardMapper scorecardMapper = cxt.getBean(ScorecardMapper.class);//实例化mapper对象
+        HashMap map = new HashMap();
+        map.put("engineId","111");
+        map.put("organId",11111);
+        map.put("type","a");
+        List list = scorecardMapper.getScorecardList(map);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println("===================="+list.get(i).toString());
+        }
+    }
+}

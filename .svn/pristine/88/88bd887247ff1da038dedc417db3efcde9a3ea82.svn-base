@@ -1,0 +1,87 @@
+package com.zw.rule.engine.service.impl;
+
+;
+import com.zw.rule.engine.po.EngineResultSet;
+import com.zw.rule.engine.service.ResultSetService;
+import com.zw.rule.mapper.engine.EngineResultSetMapper;
+import org.springframework.stereotype.Service;
+;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Administrator on 2017/5/12.
+ */
+@Service
+public class ResultSetServiceImpl implements ResultSetService {
+    @Resource
+    private EngineResultSetMapper resultSetMapper;
+
+    public ResultSetServiceImpl() {
+    }
+
+    public int addResultSet(EngineResultSet resultSet) {
+        return resultSetMapper.addResultSet(resultSet);
+    }
+
+    public List<EngineResultSet> queryResultSetByList(EngineResultSet resultSet) {
+        return resultSetMapper.queryResultSetByList(resultSet);
+    }
+
+    public EngineResultSet queryResultSetById(EngineResultSet resultSet) {
+        return resultSetMapper.queryResultSetById(resultSet);
+    }
+
+    /**
+     * 查看结果集某条数据的详情
+     * @param resultSetId
+     * @return
+     * 单元测试通过
+     */
+    public List<EngineResultSet> queryResultSetDetailsById(long resultSetId) {
+        return resultSetMapper.queryResultSetDetailsById(resultSetId);
+    }
+
+    /**
+     * 结果集列表
+     * @param map{engineId: startDate: endDate: }
+     * @return
+     * 单元测试通过
+     */
+    public List<EngineResultSet> queryEngineResultSetBySegment(Map map) {
+        return resultSetMapper.queryEngineResultSetBySegment(map);
+    }
+
+    /**
+     * 批量测试列表
+     * @param paramMap{engineId:  searchKey:  userId: }
+     * @return
+     * 单元测试通过（sql语句中searchKey参数未用）
+     */
+    public List<EngineResultSet> queryBatchTestResultSetByEngineId(Map<String, Object> paramMap) {
+        return resultSetMapper.queryBatchTestResultSetByEngineId(paramMap);
+    }
+
+    /**
+     * 批量测试结果列表
+     * @param paramMap{engineId:  searchKey:  batchNo:  userId: }
+     * @return
+     * 单元测试通过（sql语句中searchKey和engineId参数未用）
+     */
+    public List<EngineResultSet> queryBatchTestResultSetByBatchNo(Map<String, Object> paramMap) {
+        return resultSetMapper.queryBatchTestResultSetByBatchNo(paramMap);
+    }
+
+    /**
+     * 根据版本获取结果集
+     * @param param
+     * verId 版本id
+     * type 结果集类型 1.api、2.页面填写、3.批量测试
+     */
+    @Override
+    public List<EngineResultSet> queryResultList(Map<String, Object> param) {
+        return resultSetMapper.queryResultList(param);
+    }
+}

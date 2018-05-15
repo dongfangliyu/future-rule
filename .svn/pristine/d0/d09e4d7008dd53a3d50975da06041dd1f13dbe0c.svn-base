@@ -1,0 +1,15 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+version '1.0'
+
+dependencies {
+    compile project(":dao-base")
+    compile project(":rule-util")
+    compile project(":rule-model")
+}
+
+jar {
+    baseName = 'rule-mapper'
+}

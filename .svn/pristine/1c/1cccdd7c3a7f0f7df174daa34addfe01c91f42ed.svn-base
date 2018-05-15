@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta name="viewport" content="width=device-width, initial-scale = 1.0, user-scalable = no"/>
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <title>出错了!</title>
+    <style type="text/css">
+        /* 注意、警告框 */
+        .attention {
+            background: #FFFBCC;
+            border: 1px #E6DB55 solid;
+            color: #333;
+            margin: 10px;
+            padding: 8px 8px 8px 35px;
+            line-height: 22px;
+            font-size: 12px;
+        }
+        /* 圆角，CSS3支持 */
+    </style>
+</head>
+
+<body>
+<div class="attention">
+    你没权限操作此功能，请联系管理员！！
+</div>
+</body>
+</html>

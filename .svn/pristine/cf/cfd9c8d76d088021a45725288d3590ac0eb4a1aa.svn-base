@@ -1,0 +1,129 @@
+package knowledge;
+
+import com.zw.rule.knowledge.po.Rule;
+import com.zw.rule.knowledge.po.Scorecard;
+import com.zw.rule.knowledge.service.RuleService;
+import com.zw.rule.knowledge.service.ScorecardService;
+import com.zw.rule.util.StringUtil;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * <strong>Title :RuleService 单元测试用例 <br>
+ * </strong> <strong>Description : </strong>@类注释说明写在此处@<br>
+ * <strong>Create on : 2017年05月15日<br>
+ * </strong>
+ * <p>
+ * <strong>Copyright (C) zw.<br>
+ * </strong>
+ * <p>
+ *
+ * @author department:技术开发部 <br>
+ *         username:NDF <br>
+ *         email: <br>
+ * @version <strong>zw有限公司-运营平台</strong><br>
+ *          <br>
+ *          <strong>修改历史:</strong><br>
+ *          修改人 修改日期 修改描述<br>
+ *          -------------------------------------------<br>
+ *          <br>
+ *          <br>
+ */
+public class RuleServiceTest {
+
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+
+    @Test
+    public void getRuleListTest(){
+        RuleService ruleService = (RuleService) cxt.getBean("ruleServiceImpl");
+        Map paramap = new HashMap();
+//        paramap.put("status", StringUtil.toLongList("-1"));
+//        paramap.put("parentIds", "1");
+        paramap.put("type", "0");
+//        paramap.put("engineId", "1");
+//        paramap.put("organId", "1");
+        List list = ruleService.getRuleList(paramap);
+        System.out.println("paramap:"+list);
+    }
+
+
+    @Test
+    public void updateStatusTest(){
+        RuleService ruleService = (RuleService) cxt.getBean("ruleServiceImpl");
+        Map paramap = new HashMap();
+        paramap.put("status","1");
+        ArrayList idList = new ArrayList();
+        idList.add("13");
+        paramap.put("idList",idList);
+        paramap.put("status","0");
+        boolean a = ruleService.updateRuleStatus(paramap);
+        System.out.println("paramap:"+a);
+    }
+
+
+    @Test
+    public void getScorecardList(){
+        ScorecardService scorecardService = (ScorecardService) cxt.getBean("scorecardServiceImpl");
+        Map map = new HashMap();
+        ArrayList idList = new ArrayList();
+//        idList.add("13");
+//        map.put("idList",idList);
+//        map.put("status",0);
+//        map.put("parentIds", idList);
+//        map.put("type", "0");
+//        map.put("engineId", "1");
+//        map.put("organId", "1");
+        List list = scorecardService.getScorecardList(map);
+        System.out.println(list);
+    }
+
+    @Test
+    public void updateScorecardStatusTest(){
+        ScorecardService scorecardService = (ScorecardService) cxt.getBean("scorecardServiceImpl");
+        Map paramap = new HashMap();
+        paramap.put("status","0");
+        ArrayList idList = new ArrayList();
+        idList.add("14");
+        paramap.put("idList",idList);
+        paramap.put("status","0");
+        boolean a = scorecardService.updateScorecardStatus(paramap);
+        System.out.println("paramap:"+a);
+    }
+    @Test
+    public void getFieldIdsByRuleIdTest(){
+        List list = new       ArrayList();
+        list.add("15");
+        RuleService ruleService = (RuleService) cxt.getBean("ruleServiceImpl");
+        List<String> alist = ruleService.getFieldIdsByRuleId(list);
+        System.out.println(alist);
+    }
+
+    @Test
+    public void editTest(){
+        RuleService ruleService = (RuleService) cxt.getBean("ruleServiceImpl");
+        String id = "13";
+        ruleService.findById(Long.parseLong(id));
+        System.out.println("1");
+    }
+    @Test
+    public void updateRuleTest(){
+        RuleService ruleService = (RuleService) cxt.getBean("ruleServiceImpl");
+        Map param = new HashMap();
+        Rule rule = new Rule();
+        rule.setId(55L);
+        rule.setName("ndf");
+        rule.setCode("test123");
+        rule.setDesc("jshahsja");
+        
+        param.put("rule",rule);
+        boolean b = ruleService.updateRule(param);
+        System.out.println(b);
+    }
+}
+

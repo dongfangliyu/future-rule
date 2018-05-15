@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+version = '1.0'
+
+dependencies {
+    compile "log4j:log4j:${log4j}"
+    compile "commons-codec:commons-codec:${commonsCodec}"
+    compile "com.google.code.gson:gson:${gson}"
+    compile "commons-lang:commons-lang:${commonsLang}"
+    compile "org.apache.httpcomponents:httpclient:${httpClient}"
+    compile "org.apache.httpcomponents:httpcore:${httpCore}"
+    compile "org.apache.httpcomponents:httpmime:${httpMime}"
+    compile "commons-beanutils:commons-beanutils:${commonsBeanutils}"
+    compile "commons-io:commons-io:${commonsIo}"
+    compile "org.apache.commons:commons-lang3:${commonsLang3}"
+    compile "com.google.guava:guava:${guava}"
+    compile "com.alibaba:fastjson:${fastJson}"
+    compile "cglib:cglib:${cgLib}"
+    compile "commons-collections:commons-collections:${commonsCollections}"
+    compile("org.codehaus.jackson:jackson-mapper-asl:${jacksonAslversion}")
+    compile "org.apache.poi:poi:${poi}"
+    compile "org.apache.poi:poi-ooxml:${poi}"
+    compile "org.apache.poi:poi-ooxml-schemas:${poi}"
+
+}
+
+jar {
+    baseName = 'common-tools'
+}
+

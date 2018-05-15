@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.demo.CustomDbMapper">
+    <resultMap id="customDb" type="com.zw.rule.demo.pojo.CustomDb">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="engine_id" property="engineId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_by" property="createBy"/>
+    </resultMap>
+
+    <select id="getList" parameterType="java.lang.Long" resultMap="customDb">
+        SELECT * FROM zw_custom_list WHERE engine_id = #{engineId}
+    </select>
+
+    <insert id="add" parameterType="com.zw.rule.demo.pojo.CustomDb" keyColumn="id" keyProperty="id">
+        INSERT INTO zw_custom_list (name , engine_id , create_time , create_by) VALUES
+        (#{name} , #{engineId} , now() , #{createBy})
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        DELETE FROM zw_custom_list WHERE id = #{id}
+    </delete>
+
+    <select id="detail" parameterType="java.lang.Long" resultMap="customDb">
+        SELECT * FROM zw_custom_list WHERE id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.zw.rule.demo.pojo.CustomDb">
+        UPDATE zw_custom_list SET name = #{name} WHERE id = #{id}
+    </update>
+
+    <select id="getCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT count(1) FROM zw_custom_list WHERE name = #{name}
+    </select>
+
+    <select id="isCustom" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        SELECT count(1) FROM zw_engine_node WHERE ver_id = #{verId} AND node_type = 14
+    </select>
+</mapper>

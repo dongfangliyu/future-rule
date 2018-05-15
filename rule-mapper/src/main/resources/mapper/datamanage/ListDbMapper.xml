@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.datamanage.ListDbMapper">
+
+    <resultMap type="com.zw.rule.datamanage.po.ListDb" id="listDbMap">
+        <id column="id" property="id"/>
+        <result column="list_type" property="listType"/>
+        <result column="list_name" property="listName"/>
+        <result column="data_source" property="dataSource"/>
+        <result column="list_attribute" property="listAttribute"/>
+        <result column="list_desc" property="listDesc"/>
+        <result column="maintenance" property="maintenance"/>
+        <result column="match_type" property="matchType"/>
+        <result column="query_type" property="queryType"/>
+        <result column="query_field" property="queryField"/>
+        <result column="org_id" property="orgId"/>
+        <result column="status" property="status"/>
+        <result column="user_id" property="userId"/>
+        <result column="nickName" property="nickName"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="findByUser" parameterType="java.util.Map"  resultMap="listDbMap">
+        select    l.id, l.list_type as listType, l.list_name as listName, l.data_source as dataSource, l.list_attribute as listAttribute, l.list_desc as listDesc
+        , l.maintenance as maintenance, l.match_type as matchType
+        , l.query_type as queryType, l.query_field as queryField, l.org_id as orgId, l.status, l.user_id as userId, u.nick_name as nickName, l.create_time
+        from zw_list_db l, zw_sys_user u
+        where l.user_id = u.user_id
+        and l.list_type = #{listType}
+        <if test="status != null">
+            and l.status = #{status}
+        </if>
+        <if test="status == null">
+            and l.status != -1
+        </if>
+        and l.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        order by l.create_time desc
+    </select>
+
+    <select id="checkByField" parameterType="java.util.Map"  resultType="java.lang.String">
+        select group_concat(l.id) as id
+        from zw_list_db l, zw_sys_user u
+        where l.user_id = u.user_id
+        and l.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and instr(l.maintenance,#{fieldId}) > 0
+        and l.status = 1
+    </select>
+
+    <update id="updateStatus" parameterType="java.util.Map">
+        update zw_list_db
+        set status = #{status},  user_id = #{userId}, create_time = now()
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and id in
+        <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="findByListDbName" parameterType="java.util.Map"  resultType="java.lang.Integer">
+        select IFNULL(max(id),0) as id
+        from zw_list_db
+        where list_name = #{listName}
+        and list_type = #{listType}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </select>
+
+    <insert id="createListDb" useGeneratedKeys="true" keyProperty="id" parameterType="listDb">
+        insert into zw_list_db (  list_type, list_name, data_source, list_attribute, list_desc, maintenance, match_type
+        , query_type, query_field, org_id, status, user_id, create_time)
+        values (  #{listType}, #{listName}, #{dataSource}, #{listAttribute}, #{listDesc}, #{maintenance}, #{matchType}
+        , #{queryType}, #{queryField}, #{orgId}, #{status}, #{userId}, now() )
+    </insert>
+
+    <update id="createTable" parameterType="map">
+        ${sqlStr}
+    </update>
+
+    <update id="createIndex" parameterType="map">
+        ${indexSql}
+    </update>
+
+    <select id="findById" parameterType="map"  resultType="listDb">
+        select    id, list_type as listType, list_name as listName, data_source as dataSource, list_attribute as listAttribute, list_desc as listDesc
+        , maintenance as maintenance, match_type as matchType
+        , query_type as queryType, query_field as queryField, org_id as orgId, status, user_id as userId, create_time
+        from zw_list_db
+        where id = #{id}
+        and list_type = #{listType}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </select>
+
+    <select id="findListDbById" parameterType="map" resultType="listDb">
+        select list_type as listType,list_attribute as listAttribute, list_desc as listDesc, list_name as listName, query_field as queryField, match_type as matchType, query_type as queryType
+        from zw_list_db
+        where id = #{listDbId}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </select>
+
+    <select id="findListDbByIdandByorganId" parameterType="map" resultType="listDb">
+        select id,list_name as listName,list_desc as listDesc,list_type as listType, query_field as queryField, match_type as matchType, query_type as queryType
+        from zw_list_db
+        where id = #{listDbId}
+        and org_id =  #{orgId}
+    </select>
+
+
+    <select id="findListDbByIds" parameterType="map" resultType="listDb">
+        select id, list_name as listName, list_type as listType
+        , maintenance as maintenance, query_field as queryField
+        , match_type as matchType, query_type as queryType
+        from zw_list_db
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and id in
+        <foreach collection="listDbIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="findFieldsByListDbIds" parameterType="map" resultType="String">
+        select group_concat(maintenance)
+        from zw_list_db
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and id in
+        <foreach collection="listDbIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateListDb" parameterType="map">
+        update zw_list_db
+        set list_type = #{listType}, list_name = #{listName}, data_source = #{dataSource}, list_attribute = #{listAttribute}, list_desc = #{listDesc}, maintenance = #{maintenance}
+        , match_type = #{matchType}, query_type = #{queryType}, query_field = #{queryField}
+        ,  user_id = #{userId}, create_time = now()
+        where id = #{id}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+    </update>
+
+    <select id="isExists" parameterType="map"  resultType="java.lang.Integer">
+        select count(1) as ct
+        from zw_list_db l, zw_sys_user u
+        where l.user_id = u.user_id
+        and l.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and l.list_type = #{listType}
+        and l.list_name = #{listName}
+        <if test="id != null">
+            and l.id != #{id}
+        </if>
+    </select>
+
+    <select id="getQueryFieldCn" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT cn_name FROM zw_field WHERE id = #{queryField}
+    </select>
+</mapper>

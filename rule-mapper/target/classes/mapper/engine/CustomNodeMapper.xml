@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.engine.CustomNodeMapper">
+    <resultMap id="customNode" type="com.zw.rule.engine.po.CustomNode">
+        <id column="id" property="id"/>
+        <result column="text" property="text"/>
+        <result column="type" property="type"/>
+        <result column="url" property="url"/>
+        <result column="status" property="status"/>
+        <result column="engine_id" property="engineId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="update_by" property="updateBy"/>
+    </resultMap>
+
+    <select id="getNodeList" parameterType="java.lang.Long" resultMap="customNode">
+        SELECT * FROM zw_custom_node WHERE (create_by is null or create_by = #{userId}) and status = 1 order by type ASC
+    </select>
+
+    <insert id="addNode" parameterType="com.zw.rule.engine.po.CustomNode" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zw_custom_node (text , type , url , status , engine_id , create_time , create_by , update_time , update_by) VALUES
+        (#{text} , #{type} , #{url} , #{status} , #{engineId} , now() , #{createBy} , now() , #{createBy})
+    </insert>
+
+    <update id="updateNode" parameterType="com.zw.rule.engine.po.CustomNode">
+        UPDATE zw_custom_node SET text = #{text} , url = #{url} , update_time = now() , update_by = #{updateBy} WHERE id = #{id} AND engine_id = #{engineId}
+    </update>
+
+    <select id="getNode" parameterType="java.lang.Long" resultMap="customNode">
+        SELECT * FROM zw_custom_node WHERE id = #{id} and status = 1
+    </select>
+
+    <delete id="deleteNode" parameterType="java.lang.Long">
+        DELETE FROM zw_custom_node WHERE id = #{id}
+    </delete>
+
+    <select id="isExists" parameterType="java.util.Map" resultType="java.lang.Integer">
+        SELECT count(1) FROM zw_custom_node
+        <where>
+            (create_by = #{userId} OR create_by is null) AND text = #{text}
+            <if test="id != null">
+                AND id != #{id}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.knowledge.ScorecardFieldMapper">
+
+    <resultMap type="com.zw.rule.knowledge.po.ScorecardField" id="ScorecardField">
+	     <id column="id" property="id"/>    
+	     <result column="scorecard_id" property="scorecardId"/>
+         <result column="field_id" property="fieldId"/> 
+    </resultMap>
+
+    <sql id ="Base_Column">
+        id ,
+        scorecard_id as scorecardId, 
+        field_id as fieldId
+    </sql>
+    
+    <select id = "queryFieldList" parameterType = "long" resultType = "ScorecardField">
+        select  <include refid="Base_Column"/> from zw_scorecard_field where scorecard_id = #{id}
+    </select >
+    
+   <insert id = "addField" parameterType="java.util.List" >
+	    insert into zw_scorecard_field (scorecard_id,field_id)
+	     values
+	    <foreach collection="list" index="index" item="item"  separator="," >
+	     (#{item.scorecardId},#{item.fieldId})   
+		</foreach>
+    </insert>
+
+    <select id = "selectByPrimaryKey"  parameterType = "long"  resultType="ScorecardField">
+      select <include refid="Base_Column"/> from zw_scorecard_field where id = #{id}
+    </select>
+    
+    <update id = "updateField"   parameterType="java.util.List" > 
+     <foreach collection="list" index="index" item="item"  separator=";" >
+	       update zw_scorecard_field set
+	       <if test ="item.fieldId != null">
+	        field_id = #{item.fieldId}   
+	       </if>
+	       where id = #{item.id}
+       </foreach>
+    </update>
+     
+     <delete id="deleteField" parameterType="java.util.List">
+      <foreach collection="list" index="index" item="item"  separator=";" >
+        delete from zw_scorecard_field where id = #{item.id}
+      </foreach>
+    </delete>
+
+</mapper>

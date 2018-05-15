@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.rule.mapper.engine.EngineResultSetMapper">
+    <resultMap type="com.zw.rule.engine.po.EngineResultSet" id="engineresultsetMap">
+        <id column="id" property="id"/>
+        <result column="input" property="input"/>
+        <result column="create_time" property="createTime"/>
+        <result column="result" property="result"/>
+        <result column="engine_id" property="engineId"/>
+        <result column="uuid" property="uuid"/>
+        <result column="engine_ver" property="engineVer"/>
+        <result column="engine_name" property="engineName"/>
+        <result column="engine_code" property="engineCode"/>
+        <result column="type" property="type"/>
+        <result column="sub_ver" property="subVer"/>
+        <result column="scorecardscore" property="scorecardscore"/>
+        <result column="batch_no" property="batchNo"/>
+
+        <result column="startTime" property="startTime"/>
+        <result column="costTime" property="costTime"/>
+
+        <collection property="resultSetList" column="id" select="selectResultSetList" ofType="resultsetlist" javaType="ArrayList" />
+    </resultMap>
+    <resultMap type="com.zw.rule.engine.po.ResultSetList" id="resultSetListResult">
+        <id column="subId" property="id"/>
+        <result column="subType" property="type"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="remark" property="desc"/>
+        <result column="resultset_id" property="resultsetId"/>
+        <result column="expression" property="expression"/>
+    </resultMap>
+
+    <select id="selectResultSetList" parameterType="Long" resultType="com.zw.rule.engine.po.EngineResultSet" resultMap="resultSetListResult"  >
+        select
+        r.id,r.input,r.create_time,r.result,r.engine_id,r.uuid,r.engine_ver,r.engine_name,r.engine_code,
+        r.type,r.sub_ver,r.scorecardscore,
+        s.id as subId,s.type as subType,s.code,s.name,s.remark,s.resultset_id,s.expression
+        from zw_resultset r join zw_resultset_list s on r.id = s.resultset_id where r.id = #{resultSetId} order by r.id asc
+    </select>
+
+    <select id="queryResultSetDetailsById" parameterType="Long" resultMap="engineresultsetMap">
+        select *
+        from zw_resultset
+        where id = #{resultSetId}
+    </select>
+
+    <!-- 新增引擎并返回ID -->
+    <insert id="addResultSet" parameterType="engineresultset" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        zw_resultset
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="input != null">
+                input,
+            </if>
+            <if test="result != null">
+                result,
+            </if>
+            <if test="engineId != null">
+                engine_id,
+            </if>
+            <if test="uuid != null">
+                uuid,
+            </if>
+            <if test="engineVer != null">
+                engine_ver,
+            </if>
+            <if test="engineName != null">
+                engine_name,
+            </if>
+            <if test="engineCode != null">
+                engine_code,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="subVer != null">
+                sub_ver,
+            </if>
+            <if test="scorecardscore != null">
+                scorecardscore,
+            </if>
+            <if test="batchNo != null">
+                batch_no,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="input != null">
+                #{input},
+            </if>
+            <if test="result != null">
+                #{result},
+            </if>
+            <if test="engineId != null">
+                #{engineId},
+            </if>
+            <if test="uuid != null">
+                #{uuid},
+            </if>
+            <if test="engineVer != null">
+                #{engineVer},
+            </if>
+            <if test="engineName != null">
+                #{engineName},
+            </if>
+            <if test="engineCode != null">
+                #{engineCode},
+            </if>
+            <if test="type != null">
+                #{type},
+            </if>
+            <if test="subVer != null">
+                #{subVer},
+            </if>
+            <if test="scorecardscore != null">
+                #{scorecardscore},
+            </if>
+            <if test="batchNo != null">
+                #{batchNo},
+            </if>
+        </trim>
+    </insert>
+    <select id="queryResultSetByList" parameterType="engineresultset" resultMap="engineresultsetMap" >
+        SELECT
+        *
+        FROM
+        zw_engine
+        where
+        status>-1  and
+        org_id =#{orgId}
+
+        <if test="startDate != null and startDate !=''">
+            <![CDATA[ and create_time  >=  #{startDate}  ]]>
+
+        </if>
+        <if test="endDate != null and endDate !=''">
+            <![CDATA[ and create_time  <=  #{endDate}  ]]>
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="queryEngineResultSetBySegment" parameterType="map" resultMap="engineresultsetMap" >
+        SELECT
+        *
+        FROM
+        zw_resultset
+        where engine_id = #{engineId}
+
+        <if test="startDate != null and startDate !=''">
+            <![CDATA[ and create_time  >=  #{startDate}  ]]>
+
+        </if>
+        <if test="endDate != null and endDate !=''">
+            <![CDATA[ and create_time  <=  #{endDate}  ]]>
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="queryResultSetById" parameterType="engineresultset" resultMap="engineresultsetMap">
+        select  * from zw_resultset where  id = #{id}
+    </select>
+
+    <select id="queryBatchTestResultSetByEngineId" parameterType="map" resultMap="engineresultsetMap">
+        select batch_no, engine_id, engine_name, startTime, costTime
+        from(
+        select rs.batch_no, e.id as engine_id, e.name as engine_name
+        , min(rs.create_time) as startTime
+        , TIMESTAMPDIFF(second,min(rs.create_time),max(rs.create_time)) as costTime
+        from zw_resultset rs, zw_engine e
+        where rs.engine_id = e.id
+        and ( batch_no is not null and batch_no != '' )
+        and e.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and rs.engine_id = #{engineId}
+        <if test="searchKey != null and searchKey !=''">
+            and  rs.engine_name like CONCAT('%',TRIM('${searchKey}'),'%' )
+        </if>
+        group by rs.batch_no, e.id, e.name
+        )x
+        order by x.startTime desc
+    </select>
+
+    <select id="queryBatchTestResultSetByBatchNo" parameterType="map" resultMap="engineresultsetMap">
+        select rs.*
+        from zw_resultset rs, zw_engine e
+        where rs.engine_id = e.id
+        and e.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        and rs.batch_no = #{batchNo}
+        <if test="searchKey != null and searchKey !=''">
+            and (rs.id like CONCAT('%',TRIM('${searchKey}'),'%' ) or rs.engine_name like CONCAT('%',TRIM('${searchKey}'),'%' ))
+        </if>
+    </select>
+
+    <select id="queryResultList" parameterType="java.util.Map" resultMap="engineresultsetMap">
+        SELECT * FROM zw_resultset WHERE engine_ver = #{verId}
+        <if test="type != null">
+            and type = #{type}
+        </if>
+        <if test="searchPid != null">
+            and batch_no = #{searchPid}
+        </if>
+        <if test="startDate != null and startDate !=''">
+            <![CDATA[ and create_time  >=  #{startDate}  ]]>
+        </if>
+        <if test="endDate != null and endDate !=''">
+            <![CDATA[ and create_time  <=  #{endDate}  ]]>
+        </if>
+        order by create_time DESC,id DESC
+    </select>
+</mapper>

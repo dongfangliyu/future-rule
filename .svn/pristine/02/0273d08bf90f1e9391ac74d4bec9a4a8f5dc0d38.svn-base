@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.engine.EngineNodeMapper">
+  <resultMap id="engineNode" type="com.zw.rule.engine.po.EngineNode">
+    <id column="node_id" jdbcType="INTEGER" property="nodeId" />
+    <result column="ver_id" jdbcType="INTEGER" property="verId" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="node_name" jdbcType="VARCHAR" property="nodeName" />
+    <result column="node_code" jdbcType="VARCHAR" property="nodeCode" />
+    <result column="node_order" jdbcType="INTEGER" property="nodeOrder" />
+    <result column="node_type" jdbcType="INTEGER" property="nodeType" />
+    <result column="node_x" jdbcType="DECIMAL" property="nodeX" />
+    <result column="node_y" jdbcType="DECIMAL" property="nodeY" />
+    <result column="node_json" jdbcType="LONGVARCHAR" property="nodeJson" />
+    <result column="node_script" jdbcType="LONGVARCHAR" property="nodeScript" />
+    <result column="next_nodes" jdbcType="LONGVARCHAR" property="nextNodes" />
+    <result column="params" jdbcType="LONGVARCHAR" property="params" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    node_id, parent_id, ver_id, node_name, node_code, node_order, node_type, node_x, node_y,node_json,node_script,next_nodes,params
+  </sql>
+  
+  <select id="selectByPrimaryKey" parameterType="long" resultMap="engineNode">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_engine_node
+    where node_id = #{nodeId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryEngineTypedNodeListByEngineVerId" resultMap="engineNode">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_engine_node
+    where ver_id =#{verId}
+    and node_type in
+    <foreach collection="types" item = "item" open="(" separator="," close=")">
+    	#{item} 
+    </foreach>
+     ORDER BY node_order ASC
+  </select>
+  
+  <delete id = "deleteNodesByNodeIds" parameterType = "java.util.List">  
+    <![CDATA[  
+       delete from zw_engine_node where node_id in  
+    ]]>  
+    <foreach collection="commons" item = "item" open="(" separator="," close=")">
+    	#{item} 
+    </foreach>  
+  </delete> 
+  
+  <delete id="deleteByExample" parameterType="engineNode">
+    delete from zw_engine_node
+    where node_id = #{nodeId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteEngineNodeByNodeId" parameterType="java.lang.Long">
+    delete from zw_engine_node
+    where node_id = #{nodeId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="deleteNodes" parameterType = "java.util.List">  
+    delete from zw_engine_node where node_id in  
+    <foreach collection="list" item="item" open="(" separator="," close=")">
+    	#{item}
+    </foreach>  
+  </delete> 
+  
+  <insert id="insert" parameterType="engineNode" useGeneratedKeys="true" keyProperty="nodeId">
+    insert into zw_engine_node (node_id, parent_id,ver_id, node_name, 
+      node_code, node_order, node_type, 
+      node_x, node_y, node_json, 
+      node_script, next_nodes, params
+      )
+    values (#{nodeId,jdbcType=INTEGER},#{parentId,jdbcType=INTEGER}, #{verId,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, 
+      #{nodeCode,jdbcType=VARCHAR}, #{nodeOrder,jdbcType=INTEGER}, #{nodeType,jdbcType=INTEGER}, 
+      #{nodeX,jdbcType=DECIMAL}, #{nodeY,jdbcType=DECIMAL}, #{nodeJson,jdbcType=LONGVARCHAR}, 
+      #{nodeScript,jdbcType=LONGVARCHAR}, #{nextNodes,jdbcType=LONGVARCHAR}, #{params,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  
+  <insert id="insertSelective" parameterType="engineNode" useGeneratedKeys="true" keyProperty="nodeId">
+    insert into zw_engine_node (ver_id,parent_id, node_name, 
+      node_code, node_order, node_type, 
+      node_x, node_y, node_json, 
+      node_script, next_nodes, params
+      )
+    values (#{verId,jdbcType=INTEGER},#{parentId,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, 
+      #{nodeCode,jdbcType=VARCHAR}, #{nodeOrder,jdbcType=INTEGER}, #{nodeType,jdbcType=INTEGER}, 
+      #{nodeX,jdbcType=DECIMAL}, #{nodeY,jdbcType=DECIMAL}, #{nodeJson,jdbcType=LONGVARCHAR}, 
+      #{nodeScript,jdbcType=LONGVARCHAR}, #{nextNodes,jdbcType=LONGVARCHAR}, #{params,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  
+  <insert id="insertNodeAndReturnId" parameterType="engineNode" useGeneratedKeys="true" keyProperty="nodeId">
+     insert into zw_engine_node (ver_id,parent_id, node_name, 
+      node_code, node_order, node_type, 
+      node_x, node_y, node_json, 
+      node_script, next_nodes, params
+      )
+    values (#{verId,jdbcType=INTEGER},#{parentId,jdbcType=INTEGER}, #{nodeName,jdbcType=VARCHAR}, 
+      #{nodeCode,jdbcType=VARCHAR}, #{nodeOrder,jdbcType=INTEGER}, #{nodeType,jdbcType=INTEGER}, 
+      #{nodeX,jdbcType=DECIMAL}, #{nodeY,jdbcType=DECIMAL}, #{nodeJson,jdbcType=LONGVARCHAR}, 
+      #{nodeScript,jdbcType=LONGVARCHAR}, #{nextNodes,jdbcType=LONGVARCHAR}, #{params,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="engineNode">
+    update zw_engine_node
+    <set>
+      <if test="verId != null">
+        ver_id = #{verId,jdbcType=INTEGER},
+      </if>
+      <if test="parentId != null">
+        parent_id = #{parentId,jdbcType=INTEGER},
+      </if>
+      <if test="nodeName != null">
+        node_name = #{nodeName,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeCode != null">
+        node_code = #{nodeCode,jdbcType=VARCHAR},
+      </if>
+      <if test="nodeOrder != null">
+        node_order = #{nodeOrder,jdbcType=INTEGER},
+      </if>
+      <if test="nodeType != null">
+        node_type = #{nodeType,jdbcType=INTEGER},
+      </if>
+      <if test="nodeX != null">
+        node_x = #{nodeX,jdbcType=DECIMAL},
+      </if>
+      <if test="nodeY != null">
+        node_y = #{nodeY,jdbcType=DECIMAL},
+      </if>
+      <if test="nodeJson != null">
+        node_json = #{nodeJson,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="nodeScript != null">
+        node_script = #{nodeScript,jdbcType=LONGVARCHAR},
+      </if>
+      <choose>
+        <when test="lastNextnode !=null and lastNextnode == 1">
+              next_nodes =NULL,
+        </when>
+        <otherwise>
+         <if test="nextNodes != null">
+        	next_nodes = #{nextNodes,jdbcType=LONGVARCHAR},
+      	 </if>
+        </otherwise>
+    </choose>
+      
+      <if test="params != null">
+        params = #{params,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where node_id = #{nodeId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="engineNode">
+    update zw_engine_node
+    set ver_id = #{verId,jdbcType=INTEGER},
+      parent_id = #{parentId,jdbcType=INTEGER},
+      node_name = #{nodeName,jdbcType=VARCHAR},
+      node_code = #{nodeCode,jdbcType=VARCHAR},
+      node_order = #{nodeOrder,jdbcType=INTEGER},
+      node_type = #{nodeType,jdbcType=INTEGER},
+      node_x = #{nodeX,jdbcType=DECIMAL},
+      node_y = #{nodeY,jdbcType=DECIMAL},
+      node_json = #{nodeJson,jdbcType=LONGVARCHAR},
+      node_script = #{nodeScript,jdbcType=LONGVARCHAR},
+      next_nodes = #{nextNodes,jdbcType=LONGVARCHAR},
+      params = #{params,jdbcType=LONGVARCHAR}
+    where node_id = #{nodeId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateNextNodes" parameterType="engineNode">
+    update zw_engine_node
+    set next_nodes = #{nextNodes}
+    where node_id = #{nodeId}
+  </update>
+  
+  <!-- 更新节点名称 -->
+  <update id="renameNode" parameterType="java.util.Map">
+    update zw_engine_node
+    set node_name = #{nodeName,jdbcType=VARCHAR}     
+    where node_id = #{nodeId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="queryNodeListByVerId" parameterType="long" resultMap="engineNode">
+      select <include refid="Base_Column_List"/> from zw_engine_node where ver_id =#{verId}
+      ORDER BY node_order ASC
+  </select>
+  
+  <select id="queryMaxNodeOrder" parameterType="long" resultType="int">
+      select Max(node_order) from zw_engine_node where ver_id =#{verId}
+  </select>
+  
+ <update id="updateNodeForNextOrderAndParams"  parameterType="java.util.List">
+    <foreach collection="list" index="index" item="item"  separator=";" >
+	    update zw_engine_node set
+	    <if test="item.nextNodes != null">
+	       next_nodes = #{item.nextNodes},
+	    </if>
+	    <if test="item.params != null">
+	      params = #{item.params},
+	    </if>
+	   <if test="item.nodeJson != null">
+	      node_json = #{item.nodeJson},
+	    </if>
+        parent_id  = #{item.parentId }
+	    where node_id = #{item.nodeId}
+    </foreach>
+  </update>
+  
+  <select id="queryNodesByNextNode" parameterType="Map" resultMap="engineNode">
+      select  <include refid="Base_Column_List"/>  from zw_engine_node  where ver_id = #{verId} and  next_nodes like CONCAT('%',#{nodeCode},'%' )
+  </select>
+
+  <update id="updateParentIdByNodeId" parameterType="java.util.Map">
+    update zw_engine_node
+    set parent_id = #{parentId}
+    where node_id = #{nodeId}
+  </update>
+
+  <update id="updateNodePosition" parameterType="engineNode">
+    update zw_engine_node
+    set   node_x = #{nodeX,jdbcType=DECIMAL},
+    node_y = #{nodeY,jdbcType=DECIMAL}
+    where node_id = #{nodeId,jdbcType=INTEGER}
+  </update>
+
+</mapper>

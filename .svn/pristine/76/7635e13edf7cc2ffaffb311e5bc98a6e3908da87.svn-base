@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.engine.EngineMapper">
+
+     <resultMap type="com.zw.rule.engine.po.Engine" id="engineMap">
+	     <id column="id" property="id"/>
+	     <result column="code" property="code"/>    
+	     <result column="name" property="name"/>
+	     <result column="remark" property="desc"/>
+	     <result column="status" property="status"/>    
+	     <result column="create_time" property="createTime"/>
+	     <result column="update_time" property="updateTime"/>
+	     <result column="creator" property="creator"/> 
+	     <result column="org_id" property="orgId"/> 
+	     <result column="user_id" property="userId"/>  
+	     <result column="role_id" property="roleId"/>
+	     <collection property="engineVersionList" ofType="EngineVersion"  column="id"  select ="com.zw.rule.mapper.engine.EngineVersionMapper.queryEngineVersionListByEngineId"></collection>
+     </resultMap>
+     <!-- 新增引擎并返回ID -->
+     <insert id="insertEngineAndReturnId" parameterType="engine"  useGeneratedKeys="true" keyProperty="id">
+	   INSERT INTO 
+	       zw_engine
+	    <trim prefix="(" suffix=")">
+	        <if test="code != null">
+	           code,
+	        </if> 
+	        <if test="name != null">
+	           name,
+	        </if>
+	        <if test="desc != null">
+	           remark,
+	        </if>
+	        <if test="creator != null">
+	           creator,
+	        </if>
+	        <if test="userId != null">
+	           user_id,
+	        </if>
+	        <if test="orgId != null">
+	           org_id,
+	        </if>
+	        <if test="status != null">
+	           status,
+	        </if>
+			<if test="jurisdiction != null">
+				jurisdiction,
+			</if>
+			<if test="roleId != null">
+				role_id,
+			</if>
+	        create_time,update_time
+	    </trim>
+	    values
+	     <trim prefix="(" suffix=")">
+	        <if test="code != null">
+	           #{code},
+	        </if> 
+	        <if test="name != null">
+	           #{name},
+	        </if>
+	        <if test="desc != null">
+	           #{desc},
+	        </if>
+	        <if test="creator != null">
+	           #{creator},
+	        </if>
+	        <if test="userId != null">
+	           #{userId},
+	        </if>
+	        <if test="orgId != null">
+	           #{orgId},
+	        </if>
+	        <if test="status != null">
+	           #{status},
+	        </if>
+			 <if test="jurisdiction != null">
+				 #{jurisdiction},
+			 </if>
+			 <if test="roleId != null">
+				 #{roleId},
+			 </if>
+	        now(),now()
+	    </trim>
+	</insert>
+	<insert id="insertEngine" parameterType="engine"  >
+	   INSERT INTO
+		zw_engine
+	    <trim prefix="(" suffix=")">
+	        <if test="code != null">
+	           code,
+	        </if> 
+	        <if test="name != null">
+	           name,
+	        </if>
+	        <if test="desc != null">
+				remark,
+	        </if>
+	        <if test="creator != null">
+	           creator,
+	        </if>
+	        <if test="userId != null">
+	           user_id,
+	        </if>
+	        <if test="orgId != null">
+	           org_id,
+	        </if>
+	        <if test="status != null">
+	           status,
+	        </if>
+	          create_time,update_time	      
+	    </trim>
+	    values
+	     <trim prefix="(" suffix=")">
+	        <if test="code != null">
+	           #{code},
+	        </if> 
+	        <if test="name != null">
+	           #{name},
+	        </if>
+	        <if test="desc != null">
+	           #{desc},
+	        </if>
+	        <if test="creator != null">
+	           #{creator},
+	        </if>
+	        <if test="userId != null">
+	           #{userId},
+	        </if>
+	        <if test="orgId != null">
+	           #{orgId},
+	        </if>
+	        <if test="status != null">
+	           #{status},
+	        </if>
+	         now(),now()      
+	    </trim>
+	</insert>
+	<update id="updateEngine" parameterType="engine"  >
+		 UPDATE  zw_engine 
+		 <set>
+		   <if test="code != null">
+		     code = #{code},
+		   </if>
+		   <if test="name != null">
+		     name = #{name},
+		   </if>
+		   <if test="desc != null">
+			   remark = #{desc},
+		   </if>
+		   <if test="status != null">
+		     status = #{status},
+		   </if>
+		   <if test="creator != null">
+		     creator = #{creator},
+		   </if>
+		   <if test="userId != null">
+		     user_id = #{userId},
+		   </if>
+		   <if test="jurisdiction != null">
+			 jurisdiction=#{jurisdiction},
+		   </if>
+		   <if test="roleId != null">
+			   role_id=#{roleId},
+		   </if>
+			update_time = now()
+		</set>		    		  
+	   		WHERE
+	         org_id= #{orgId}	
+	          and id = #{id}
+	</update>
+	
+	<select id="getEngineByList"   parameterType="engine" resultMap="engineMap" >
+       SELECT 
+            *
+         FROM
+		zw_engine 
+         where 
+                status>-1  and
+                org_id =#{orgId}
+		 <if test="searchString != null and searchString !=''">
+     		  and  name like CONCAT('%',TRIM('${searchString}'),'%' )
+		 </if>
+		<if test="roleId != null">
+			and ((role_id = #{roleId} and jurisdiction=2) or user_id = #{userId} or jurisdiction = 1)
+		</if>
+		 order by update_time desc
+	</select>
+	
+	<!-- 根据权限查询本公司引擎 -->
+	<select id="getEngineList"   resultMap="engineMap" >
+       SELECT 
+            *
+         FROM  
+            zw_engine 
+         where 
+                status>-1  and
+                org_id =#{orgId}
+               
+		 <if test="searchString != null and searchString !=''">		    
+     		  and (code like CONCAT('%',TRIM('${searchString}'),'%' ) or name like CONCAT('%',TRIM('${searchString}'),'%' ))   
+		 </if>	
+    	 <if test="list!=null and list.size()>0">
+   		      and id in 
+   		    	<foreach collection="list" item="ids" index="index" 
+					open="(" separator="," close=")">#{ids}
+			    </foreach>
+		</if>
+		 order by update_time desc		
+	</select>
+	
+	<select id="getTestEngineListByIds" parameterType="map"  resultMap="engineMap" >
+       select id, name, remark, update_time as updateTime
+         from zw_engine
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+              and status !=-1
+              <if test="searchString != null and searchString !=''">
+              and name like like '%${searchKey}%'
+              </if>
+              and id in
+              <foreach collection="Ids" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+              </foreach>
+		 order by update_time desc
+	</select>
+	
+	<select id="getEngineById" resultMap="engineMap" parameterType="engine" >
+	 SELECT 
+            *
+         FROM  
+            zw_engine 
+         where status>-1
+		 <if test="orgId != null and orgId != ''">
+			and org_id =#{orgId}
+		 </if>
+         and id = #{id}
+	</select>
+
+	<delete id="deleteEngine"  parameterType="engine" >
+		DELETE t , v , n , nk , kl , f , ft , r , k  FROM zw_engine as t LEFT JOIN zw_engine_version as v on t.id = v.engine_id LEFT JOIN zw_engine_node as n
+		on v.ver_id = n.ver_id LEFT JOIN zw_node_knowledge_link as nk on n.node_id = nk.node_id LEFT JOIN zw_engine_knowledge_tree_link as kl on t.id = kl.engine_id LEFT JOIN zw_field_user_link as f on
+		t.id = f.engine_id LEFT JOIN zw_field_type_user_link as ft on t.id = ft.engine_id LEFT JOIN zw_rule as r on t.id = r.engine_id LEFT JOIN zw_knowledge_tree as k
+		on t.id = k.engine_id LEFT JOIN zw_engine_rule_link as er on t.id = er.engine_id
+		where
+		t.id = #{id}
+	</delete>
+
+	<select id="getEngineByCode" resultMap="engineMap" parameterType="engine" >
+	 SELECT 
+            *
+         FROM  
+            zw_engine 
+         where 
+          status=1  and
+          org_id =#{orgId}
+          and id = #{id}
+	</select>
+</mapper>

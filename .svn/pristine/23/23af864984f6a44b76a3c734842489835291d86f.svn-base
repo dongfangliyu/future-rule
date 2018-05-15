@@ -1,0 +1,19 @@
+﻿body {
+	font-size: 14px;
+	background: #fff;
+	overflow: hidden;
+}
+.error_404 {
+	background: #fff;
+	height: 540px;
+	padding-bottom: 30px;
+}
+
+.error_404 .container {
+	overflow: hidden;
+}
+
+.error_404 .error_pic {
+	height: 540px;
+	background: url(../images/404.png) no-repeat center center;
+}

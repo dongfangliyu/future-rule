@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.datamanage.TblColumnMapper">
+
+    <resultMap type="com.zw.rule.datamanage.po.TblColumn" id="tblColumnMap">
+        <result column="colName" property="colName"/>
+        <result column="colComment" property="colComment"/>
+        <result column="colOrder" property="colOrder"/>
+    </resultMap>
+
+    <select id="getColumnList" parameterType="map"  resultType="tblColumn">
+        select COLUMN_NAME as colName, COLUMN_COMMENT as colComment, ORDINAL_POSITION as colOrder
+        from information_schema.COLUMNS
+        where TABLE_SCHEMA = '${schemaName}'
+        and TABLE_NAME = '${tableName}'
+        and COLUMN_COMMENT != ''
+        order by ORDINAL_POSITION
+    </select>
+
+</mapper>

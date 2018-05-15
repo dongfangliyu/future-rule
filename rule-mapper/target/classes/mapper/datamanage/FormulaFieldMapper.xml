@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zw.rule.mapper.datamanage.FormulaFieldMapper">
+    <insert id ="createFormulaField" parameterType="java.util.List" >
+        <selectKey resultType ="java.lang.Integer" keyProperty= "id"
+                   order= "AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey >
+        insert into zw_formula_field_link(field_id, formula_field_id)
+        values
+        <foreach collection ="list" item="formulaFieldVo" index= "index" separator =",">
+            (
+            #{formulaFieldVo.fieldId}, #{formulaFieldVo.formulaFieldId}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteFormulaField" parameterType="map" >
+        delete from zw_formula_field_link
+        where field_id = ( select field_id from zw_field_user_link
+        where field_id = #{fieldId}
+        and org_id = (
+        select org_id from zw_sys_user
+        where user_id = #{userId}
+        <if test="engineId != null">
+            and engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and engine_id is null
+        </if>
+        )
+        )
+
+
+    </delete>
+</mapper>

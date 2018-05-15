@@ -1,0 +1,90 @@
+package datamanager;
+
+import com.zw.rule.datamanage.po.CustList;
+import com.zw.rule.datamanage.po.ListDb;
+import com.zw.rule.datamanage.po.NodeListDb;
+import com.zw.rule.datamanage.po.TblColumn;
+import com.zw.rule.mapper.datamanage.CustListMapper;
+import com.zw.rule.mapper.datamanage.ListDbMapper;
+import com.zw.rule.mapper.datamanage.NodeListDbMapper;
+import com.zw.rule.mapper.datamanage.TblColumnMapper;
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by Administrator on 2017/5/4.
+ */
+public class ListDbMapperTest {
+    //加载配置文件
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+    //创建mapper对象
+    private ListDbMapper listDbMapper;
+    private NodeListDbMapper nodeListDbMapper;
+    private TblColumnMapper tblColumnMapper;
+    private CustListMapper custListMapper;
+
+    @Before
+    public void MapperTest() throws Exception {
+        listDbMapper = cxt.getBean(ListDbMapper.class);
+        nodeListDbMapper = cxt.getBean(NodeListDbMapper.class);
+        tblColumnMapper = cxt.getBean(TblColumnMapper.class);
+        custListMapper = cxt.getBean(CustListMapper.class);
+    }
+
+    @Test
+    public void findByUser() {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("userId", "136");
+        param.put("listType", "b");
+        List<ListDb> list = listDbMapper.findByUser(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+
+    @Test
+    public void createListDb() {
+        ListDb listDb = new ListDb();
+        listDb.setListType("b");
+        listDb.setListName("test");
+//        listDb.setTableColumn("12");
+        listDb.setStatus(1);
+        listDb.setUserId(136l);
+        boolean flag = listDbMapper.createListDb(listDb);
+        if(flag){
+            System.out.println("成功");
+        }
+    }
+
+    @Test
+    public void getColumnList() {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("schemaName", "zwjkhf");
+        param.put("tableName", "t_user");
+        List<TblColumn> list = tblColumnMapper.getColumnList(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+    @Test
+    public void findCustList() {
+        Map<String, Object> param = new HashMap<String, Object>();
+        param.put("tableName", "organ_1_w_15");
+        List<CustList> list = custListMapper.findCustList(param);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+
+    @Test
+    public void findDbListByNodeId() {
+        NodeListDb nodeListDb = nodeListDbMapper.findDbListByNodeId(153l);
+        System.out.println(nodeListDb);
+    }
+}

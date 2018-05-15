@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.datamanage.FieldTypeUserMapper">
+
+     <resultMap type="com.zw.rule.datamanage.po.FieldTypeUser" id="FieldTypeUser">
+	     <id column="id" property="id"/>    
+	     <result column="field_type_id" property="fieldTypeId"/>    
+	     <result column="org_id" property="orgId"/>
+	     <result column="engine_id" property="engineId"/>
+	     <result column="user_id" property="userId"/>
+     </resultMap>
+     
+    <insert id="createFieldTypeUserRel" useGeneratedKeys="true" keyProperty="id" parameterType="FieldTypeUser">
+	   insert into zw_field_type_user_link ( field_type_id, org_id, engine_id, user_id, create_time )
+                                  values ( #{fieldTypeId}, #{orgId}, #{engineId}, #{userId}, now() )
+	</insert>
+	
+	<insert id="batchBindEngineFieldTypeUserRel" parameterType="map">
+	   insert into zw_field_type_user_link ( field_type_id, org_id, engine_id, user_id, create_time )
+       select field_type_id, org_id, #{engineId}, #{userId}, now()
+         from zw_field_type_user_link r
+        where r.field_type_id in
+              <foreach collection="fieldTypeIds" item="item" index="index" open="(" separator="," close=")">  
+                #{item}
+              </foreach>
+              and field_type_id not in ( select field_type_id from zw_field_type_user_link where engine_id = #{engineId})
+              and engine_id is null
+	</insert>
+
+    <delete id="deleteEngineFieldTypeRel" parameterType="map">
+        DELETE FROM zw_field_type_user_link WHERE id in
+        <foreach collection="fieldTypeIdsCom" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <select id="selectEngineFieldTypeRel" parameterType="map" resultType="Integer">
+        SELECT ft.id FROM zw_field_type_user_link as ft RIGHT JOIN zw_field_type as f on f.id=ft.field_type_id WHERE ft.engine_id = #{engineId} and f.is_common = 1
+    </select>
+
+    <insert id="engineFieldTypeUserRel" parameterType="map">
+        insert into zw_field_type_user_link ( field_type_id, org_id, engine_id, user_id, create_time ) VALUES
+        <foreach collection="fieldTypeIds" item="item" index="index" open="" separator="," close="">
+            ( #{item}, #{orgId}, #{engineId}, #{userId}, now() )
+        </foreach>
+    </insert>
+
+	<select id="queryNodeIds" parameterType="map" resultType="String">
+		 select group_concat(field_type_id)
+           from zw_field_type_user_link x
+          where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+                and engine_id = #{engineId}
+                and exists (select field_type_id 
+                              from zw_field_type_user_link y 
+                             where x.field_type_id = y.field_type_id 
+                                   and y.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+                                   and y.engine_id is null
+                            )
+	</select>
+	
+	<delete id="deleteFieldTypeUserRel" parameterType="map">
+	   delete from zw_field_type_user_link
+	    where 
+	         org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+             <if test="engineId != null">
+             and engine_id = #{engineId}
+             </if>
+             <if test="engineId == null">
+             and engine_id is null
+             </if>
+	         and field_type_id = #{fieldTypeId}
+	</delete>
+	
+	<update id="updateFieldTypeUserRel" parameterType="map">
+       update zw_field_type_user_link
+          set   user_id = #{userId}, create_time = now()
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+            <if test="engineId != null">
+              and engine_id = #{engineId}
+            </if> 
+            <if test="engineId == null">
+              and engine_id is null
+            </if>
+              and field_type_id = #{id}
+    </update>
+
+    <update id="fieldTypeUserRel" parameterType="map">
+        update zw_field_type_user_link
+        set   STATUS = -1, create_time = now()
+        where org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and engine_id is null
+        </if>
+        and field_type_id = #{id}
+    </update>
+
+</mapper>

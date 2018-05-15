@@ -1,0 +1,24 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+version '1.0'
+
+dependencies {
+    compile project(":rule-model")
+    compile project(":rule-mapper")
+    compile project(":rule-util")
+
+    compile "org.apache.poi:poi:${poi}"
+    compile "org.apache.poi:poi-ooxml:${poi}"
+    compile "org.apache.poi:poi-ooxml-schemas:${poi}"
+    compile "com.itextpdf:itextpdf:${itextpdf}"
+    compile "com.itextpdf:itext-asian:${itextAsian}"
+    compile "com.fasterxml.jackson.core:jackson-core:${jackson}"
+    compile "com.fasterxml.jackson.core:jackson-databind:${jackson}"
+    compile "org.springframework:spring-web:${spring}"
+}
+
+jar {
+    baseName = 'rule-service'
+}

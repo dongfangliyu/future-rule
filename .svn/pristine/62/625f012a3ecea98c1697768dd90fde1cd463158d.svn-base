@@ -1,0 +1,99 @@
+package knowledge;
+
+import com.zw.rule.knowledge.po.KnowledgeTree;
+import com.zw.rule.knowledge.po.RuleContent;
+import com.zw.rule.knowledge.service.EngineRuleRelService;
+import com.zw.rule.knowledge.service.KnowledgeTreeRelService;
+import com.zw.rule.knowledge.service.KnowledgeTreeService;
+import com.zw.rule.knowledge.service.RuleContentService;
+import com.zw.rule.service.SysOrganizationService;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * Created by Administrator on 2017/5/3.
+ */
+public class knowServiceTest {
+
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+
+    @Test
+    public void doTest() throws Exception {
+        //EngineRuleRelService测试
+        /*EngineRuleRelService engineRuleRelService = (EngineRuleRelService) cxt.getBean("engineRuleRelServiceImpl");
+        List ruleIds = new ArrayList();
+        ruleIds.add(1111);  ruleIds.add(2222);  ruleIds.add(3333);
+        long engineId = 11111;
+        HashMap map = new HashMap();
+        map.put("idList", ruleIds);
+        map.put("engineId", engineId);
+        //boolean flag = engineRuleRelService.insertRel(map);
+        //boolean flag = engineRuleRelService.deleteRel(map);
+        //assertEquals("测试员",flag);
+
+        List list = engineRuleRelService.getRuleIdsByEngineId(183l);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }*/
+
+        //KnowledgeTreeRelService测试
+        /*KnowledgeTreeRelService service = (KnowledgeTreeRelService) cxt.getBean("knowledgeTreeRelServiceImpl");
+        List ids = new ArrayList();
+        ids.add(1111); ids.add(2222); ids.add(3333);
+        long engineId = 11111;
+        HashMap map = new HashMap();
+        map.put("idList", ids);
+        map.put("engineId", engineId);
+        //boolean flag = service.insertRel(map);
+        boolean flag = service.deleteRel(engineId);
+        System.out.println("==============  "+flag+"  ==============");
+        List list = service.findTreeIdsByEngineId(114l);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }*/
+
+        //RuleContentService测试
+        /*RuleContentService service = (RuleContentService) cxt.getBean("ruleContentServiceImpl");
+        *//*List list = service.getRuleContentList(58l);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }*//*
+        //RuleContent o = service.findById(58l);
+        //System.out.println(o.getId()+"---"+o.getRuleId());
+        RuleContent o1 = new RuleContent();
+        //o1.setFieldId("cs11改");o1.setFieldValue("cs11改");
+        o1.setId(62l);
+        RuleContent o2 = new RuleContent();
+        //o2.setFieldId("cs22改");o2.setFieldValue("cs22改");
+        o2.setId(63l);
+        List list = new ArrayList();
+        list.add(o1);list.add(o2);
+        //boolean flag = service.insertRuleContent(list);
+        //boolean flag = service.updateRuleContent(list);
+        boolean flag = service.deleteRuleContent(list);
+        System.out.println("==============  "+flag+"  ==============");*/
+
+        //KnowledgeTreeService测试
+        KnowledgeTreeService service = (KnowledgeTreeService)cxt.getBean("knowledgeTreeServiceImpl");
+        //System.out.println(service.findById(1l));
+        KnowledgeTree o = new KnowledgeTree();
+        o.setName("测试");o.setParentId(1l);o.setUserId(1l);o.setStatus(0);o.setType(0);o.setTreeType(0);
+        //o.setName("测试22");o.setParentId(2l);o.setStatus(2);o.setType(2);o.setId(1046l);
+        //boolean flag = service.insertTree(o);
+        //boolean flag = service.updateTree(o);
+        KnowledgeTree o2 = new KnowledgeTree();
+        o2.setName("测试33");o2.setParentId(3l);o2.setUserId(3l);o2.setStatus(3);o2.setType(3);o2.setTreeType(3);
+        List list = new ArrayList();
+        list.add(o);//list.add(o2);
+        int i = service.batchInsert(list);
+        System.out.println("==============  "+i+"  ==============");
+    }
+}

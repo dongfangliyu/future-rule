@@ -1,0 +1,267 @@
+p{
+    margin: 0px;
+    padding: 0px;
+}
+.blackadd,.whiteadd,.blackadds {
+    width:20px;
+    height:20px;
+    display:inline-block;;
+    background: url(../images/blackadd.png) center center;
+    background-size: cover;
+}
+#accuLi{
+    width:95%;
+    line-height:33px;
+    border-top:1px dashed #DEDEDE;
+    border-bottom:1px dashed #DEDEDE;
+    margin-left:18px;
+}
+#maintenIncre,#maintenIncres,#searchIncres,#searchIncre{
+    width:98%;
+    border:1px solid #ddd;
+    height:9em;
+}
+.maintence{
+    line-height: 27px!important;
+    height:27px!important;
+    width:95%!important;
+    margin-right:5em;
+}
+.mainSea{
+    text-align: left;
+    margin-left:19px!important;
+}
+.maintence>label:nth-child(2){
+    float:right;
+}
+.maintence>label:nth-child(3){
+    float:right;
+    margin-right:2em;
+}
+#maintenIncre>div,#searchIncre>div{
+    width:26px;
+}
+.operate{
+
+}
+/*#search{
+    width: 165px;
+    height: 30px;
+    border: 1px solid #E6E6E6;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #777777;
+    text-align: left;
+}*/
+/*.whiteSea {
+    width: 172px;
+    float: right;
+    position: relative;
+}*/
+.search_btn{
+    position: relative;
+    right: 3em;
+    top: -1px;
+}
+.choose{
+    text-align: left;
+    width:98%!important;
+    border-top:1px solid #ddd;
+    border-bottom:1px solid #ddd;
+    line-height: 40px!important;
+    height:40px!important;
+}
+.blackadd,.whiteadd,.blackadds{
+    float: left;
+    margin-top: 7px;
+    margin-left: 7px;
+}
+.valName,.afflivalName{
+    display: inline-block;
+    font-weight: normal;
+    float:left;
+    height:47px;
+    background: #EDEDED ;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+#affliValue{
+    width: 100%;
+}
+#affliValue div{
+    float:left;
+    width:50%;
+    text-align: left;
+}
+#affliValue div b{
+    font-weight: normal;
+}
+.mainVal,.afflimainVal{
+    font-weight: normal;
+}
+#dataSource{
+    height:28px;
+}
+#maintenIncre b.queryStyle,#searchIncre b.queryStyle{
+    float:left;
+    margin-right:10px;
+    background: #EDEDED;
+    font-weight: normal;
+}
+#maintenIncre b.queryStyle:hover,#searchIncre b.queryStyle:hover{
+    background: #398DEE;
+    color:#fff;
+}
+#download{
+    float:right;
+}
+#search,#searchDetail,#searchTest{
+    float:right;
+    margin-right:20px;
+}
+#searchTest{
+    float:right;
+    width: 21em;
+    height: 2em;
+    margin: 1.5em;
+    margin-top: 1em;
+    margin-right:1em;
+}
+#form1 .whiteImg{
+    float:right;
+    position: relative;
+    right:3.5em;
+    top:6px;
+}
+#detail_list tbody th{
+    display: none;
+}
+#Add_detail_style ul li{
+    width: 48%;
+}
+#Add_detail_style ul li label:first-child{
+    width: 42%;
+    text-align: center;
+}
+#Add_detail_style ul li label:last-child{
+    float:left;
+}
+#Edit_detail_style ul li{
+    width: 48%;
+}
+#Edit_detail_style ul li label:first-child{
+    width: 42%;
+    text-align: center;
+}
+#Edit_detail_style ul li label:last-child{
+    float:left;
+}
+#Lead_detail_style ul li:first-child input{
+    background: #fff!important;
+    width:90%;
+    margin-left:0px;
+    height:3em;
+    padding-left:21px;
+}
+#Lead_detail_style ul li:first-child{
+    width:100%;
+    margin-left:0px;
+}
+#Lead_detail_style ul li:nth-child(2){
+    text-align: left;
+    margin-left:5%;
+}
+/*#Lead_detail_style ul li:nth-child(2) input{
+    height: 2.5em;
+    margin-left: 17%;
+    line-height: 2.5em;
+    width: 11em;
+    background: #FAFAFA;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    margin-top: 16px;
+    color: #444444;
+    text-align: center;
+}
+#Lead_detail_style ul li:nth-child(2) input:hover{
+    background: #EEEEEE;
+}*/
+.select-file {
+    width: 450px;
+    height: 35px;
+    margin: 15px 0 0 0;
+    overflow: hidden;
+}
+.a-upload {
+    padding: 4px 10px;
+    height: 35px;
+    line-height: 26px;
+    position: relative;
+    cursor: pointer;
+    color: #888;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+    width: 125px;
+    font-size: 14px;
+    text-decoration: none;
+}
+.a-upload input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    cursor: pointer;
+}
+.batch-right {
+    width: 300px;
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    color: #A9A9A9;
+    float: right;
+    cursor: default;
+}
+.a-upload:hover{
+    background: #EEEEEE;
+    color:#444444;
+    text-decoration: none;
+}
+#testInfo_list thead th:first-child{
+    display: none;
+}
+.productBatch{
+    margin-right: 22px;
+}
+.productBatch,.leadBatch{
+    color: #398dee;
+}
+#produce_detail_style ul li{
+    margin-left:13%!important;
+    width:267px!important;
+}
+#rowCt{
+    margin-left:0px;
+    position: relative;
+    left:-5px;
+}
+#produce_detail_style input{
+    text-align: center;
+}
+#Add_mainSea_style .page_jump{
+    display: none;
+}
+/*#Data_list tbody tr td{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow: ellipsis;
+}
+#Data_list{
+    table-layout:fixed;
+    word-wrap:break-word;
+}*/

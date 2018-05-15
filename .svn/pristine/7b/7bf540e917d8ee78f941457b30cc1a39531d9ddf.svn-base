@@ -1,0 +1,55 @@
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'maven'
+
+version = '1.0'
+
+dependencies {
+    compile project(":common-tools")
+    compile project(":dao-base")
+    compile project(":rule-mapper")
+    compile project(":rule-model")
+    compile project(":rule-util")
+    compile project(":rule-service")
+
+    compile "log4j:log4j:${log4j}"
+    compile "org.apache.commons:commons-lang3:${commonsLang3}"
+    compile "commons-lang:commons-lang:${commonsLang}"
+    compile "commons-io:commons-io:${commonsIo}"
+    compile "commons-logging:commons-logging:${commonsLogging}"
+    compile "commons-codec:commons-codec:${commonsCodec}"
+    compile "commons-beanutils:commons-beanutils:${commonsBeanutils}"
+    compile "org.springframework:spring-core:${spring}"
+    compile "org.springframework:spring-tx:${spring}"
+    compile "org.springframework:spring-web:${spring}"
+    compile "org.springframework:spring-webmvc:${spring}"
+    compile "org.springframework:spring-beans:${spring}"
+    compile "org.springframework:spring-webmvc-portlet:${spring}"
+    compile "org.springframework:spring-context-support:${spring}"
+    compile "org.springframework:spring-context:${spring}"
+    compile "org.springframework:spring-jdbc:${spring}"
+    compile "com.fasterxml.jackson.core:jackson-core:${jackson}"
+    compile "com.fasterxml.jackson.core:jackson-databind:${jackson}"
+    compile "org.patchca:patchca:${patchca}"
+    compile "commons-fileupload:commons-fileupload:${commonsFileupload}"
+    compile "com.google.guava:guava:${guava}"
+    compile "com.alibaba:fastjson:${fastJson}"
+    compile "org.apache.zookeeper:zookeeper:${zookeeper}"
+    compile "org.aspectj:aspectjweaver:${aspectJweaver}"
+    compile "cglib:cglib:${cgLib}"
+    compile "jstl:jstl:${jstl}"
+    compile "org.javassist:javassist:${javassist}"
+    compile "com.101tec:zkclient:${zkclient}"
+    compile "commons-collections:commons-collections:${commonsCollections}"
+    compile("org.apache.shiro:shiro-core:${shiroversion}")
+    compile("org.apache.shiro:shiro-web:${shiroversion}")
+    compile("org.apache.shiro:shiro-ehcache:${shiroversion}")
+    compile("net.sf.ehcache:ehcache:${ehcacheversion}")
+    compile("org.apache.shiro:shiro-spring:${shiroversion}")
+
+    compile "com.alibaba:druid:${druid}"
+    compile "mysql:mysql-connector-java:${mysql}"
+
+    providedCompile 'org.apache.tomcat:servlet-api:6.0.45'
+    providedCompile 'org.apache.tomcat:jsp-api:6.0.45'
+}

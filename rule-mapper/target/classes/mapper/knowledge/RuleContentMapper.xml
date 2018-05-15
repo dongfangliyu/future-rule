@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper  namespace="com.zw.rule.mapper.knowledge.RuleContentMapper">
+
+    <resultMap type="com.zw.rule.knowledge.po.RuleContent" id="ruleContent">
+        <id column="id" property="id"/>
+        <result column="cn_name" property="cnName"/>
+        <result column="field_id" property="fieldId"/>
+        <result column="field_value" property="fieldValue"/>
+        <result column="rule_id" property="ruleId"/>
+        <result column="en_name" property="enName"/>
+        <result column="value_type" property="valueType"/>
+        <result column="restrain_scope" property="restrainScope"/>
+    </resultMap>
+
+    <sql id ="Base_Column">
+        r.id,
+        t.cn_name as cnName,
+        r.field_id as fieldId,
+        r.field_value as fieldValue,
+        r.rule_id as ruleId,
+        t.en_name as enName,
+        t.value_type as valueType,
+        t.restrain_scope as restrainScope
+    </sql>
+
+    <select id = "getRuleContentList" parameterType = "long" resultType = "ruleContent">
+        select  <include refid="Base_Column"/> from zw_rule_content r  left join zw_field t on r.field_id = CONCAT(t.id,'|',t.en_name ) where r.rule_id = #{id}
+    </select>
+
+    <insert id = "insertRuleContent"   parameterType="java.util.List">
+        insert into zw_rule_content (field_id,field_value,rule_id)
+        values
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.fieldId},#{item.fieldValue},#{item.ruleId})
+        </foreach>
+    </insert>
+
+    <select id = "selectByPrimaryKey"  parameterType = "long"  resultType="ruleContent">
+        select id,field_id as fieldId,field_value as fieldValue,rule_id as ruleId from zw_rule_content where id = #{id}
+    </select>
+
+    <update id = "updateRuleContent"   parameterType="java.util.List" >
+        <foreach collection="list" index="index" item="item"  separator=";" >
+            update zw_rule_content
+            <set>
+                <if test ="item.fieldId!= null">
+                    field_id = #{item.fieldId},
+                </if>
+                <if test ="item.fieldValue != null">
+                    field_value = #{item.fieldValue},
+                </if>
+            </set>
+            where id = #{item.id}
+        </foreach>
+    </update>
+
+    <delete id="deleteRuleContent" parameterType="java.util.List">
+        <foreach collection="list" index="index" item="item"  separator=";" >
+            delete from zw_rule_content where id = #{item.id}
+        </foreach>
+    </delete>
+
+    <select id = "selectNodeByRuleList" parameterType = "nodeKnowledge" resultType="ruleContent">
+        select <include refid="Base_Column"/> from zw_rule_content  WHERE zw_rule_content.rule_id IN( SELECT knowledge_id FROM zw_node_knowledge_link WHERE zw_node_knowledge_link.`node_id`=#{id}
+        AND zw_node_knowledge_link.`knowledge_type`=#{knowledge_type}
+    </select>
+</mapper>

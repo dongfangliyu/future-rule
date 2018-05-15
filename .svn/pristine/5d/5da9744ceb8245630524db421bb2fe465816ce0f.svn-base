@@ -1,0 +1,40 @@
+package knowledge;
+
+import com.zw.rule.knowledge.po.RuleField;
+import com.zw.rule.mapper.knowledge.RuleFieldMapper;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by Administrator on 2017/5/11 0011.
+ */
+public class RuleFieldMapperTest {
+    //加载配置文件
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+    @Test
+    public void getFieldListTest() {
+        RuleFieldMapper ruleFieldMapper = cxt.getBean(RuleFieldMapper.class);//实例化mapper对象
+        List list = ruleFieldMapper.getFieldList(17L);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println("===================="+list.get(i).toString());
+        }
+    }
+    @Test
+    public void insertFieldTest() {
+        RuleFieldMapper ruleFieldMapper = cxt.getBean(RuleFieldMapper.class);//实例化mapper对象
+        List<RuleField> list = new ArrayList();
+        RuleField ruleField = new RuleField();
+        ruleField.setLogicalSymbol("11111");
+        ruleField.setOperator("11111");
+        ruleField.setFieldValue("1111");
+        ruleField.setFieldId("1111");
+        ruleField.setRuleId(1L);
+        list.add(ruleField);
+        int a = ruleFieldMapper.insertField(list);
+            System.out.println("===================="+a);
+    }
+}

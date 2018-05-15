@@ -1,0 +1,35 @@
+package datamanager;
+
+import com.zw.rule.jeval.tools.MD5;
+import com.zw.rule.mapper.datamanage.FieldCondMapper;
+import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
+
+import java.util.List;
+
+/**
+ * Created by Administrator on 2017/5/4 0004.
+ */
+public class FieldCondMapperTest {
+    //加载配置文件
+    ApplicationContext cxt = new ClassPathXmlApplicationContext("classpath*:/spring/spring-context.xml");
+    @Test
+    public void test() {
+        FieldCondMapper fieldCondMapper = cxt.getBean(FieldCondMapper.class);//实例化mapper对象
+        List list = fieldCondMapper.getFieldCondList(29L);
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println(list.get(i).toString());
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+//       2&4e2c6f4f7f7$333#3j6a672e6@  query,1498273513286,6j75yunig7,5afb4186-c0f4-4821-ac1e-64f50036b761,刘德华,c3f2044a-5834-4550-bfb6-7b8dc816f0f5
+        //query,1498273513286,6j75yunig7,5afb4186-c0f4-4821-ac1e-64f50036b761,刘德华,c3f2044a-5834-4550-bfb6-7b8dc816f0f5
+        String str = "query,1498273513286,6j75yunig7,5afb4186-c0f4-4821-ac1e-64f50036b761,刘德华,c3f2044a-5834-4550-bfb6-7b8dc816f0f5";
+        String newsign = MD5.GetMD5Code(str);
+        System.out.print("==============="+newsign);
+        Long ts = Long.valueOf("1498273544914");
+        System.out.print("==============="+ts);
+    }
+}

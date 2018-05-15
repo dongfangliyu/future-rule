@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.engine.EngineVersionMapper">
+ 
+  <resultMap id="EngineVersionMap" type="com.zw.rule.engine.po.EngineVersion">
+    <id column="ver_id" jdbcType="INTEGER" property="verId" />
+    <result column="engine_id" jdbcType="INTEGER" property="engineId" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="sub_ver" jdbcType="INTEGER" property="subVer" />
+    <result column="boot_state" jdbcType="INTEGER" property="bootState" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="layout" jdbcType="INTEGER" property="layout" />
+    <result column="user_id" jdbcType="INTEGER" property="userId" />
+    <result column="create_time" jdbcType="VARCHAR" property="createTime" />
+    <result column="latest_user" jdbcType="INTEGER" property="latestUser" />
+    <result column="latest_time" jdbcType="VARCHAR" property="latestTime" />
+    
+    <result column="engineName" jdbcType="VARCHAR" property="engineName" />
+    <result column="description" jdbcType="VARCHAR" property="engineDesc" />
+    
+    <collection property="engineNodeList" ofType="engineNode"  column="ver_id"  select ="com.zw.rule.mapper.engine.EngineNodeMapper.queryNodeListByVerId"></collection>
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    ver_id as verId, engine_id as engineId, version, boot_state as bootState, status, layout, user_id as userId, create_time as createTime,
+    latest_user as latestUser, latest_time as latestTime, sub_ver as subVer
+  </sql>
+  
+  <select id="queryLatestEngineSubVersion" parameterType="EngineVersion" resultType="com.zw.rule.engine.po.EngineVersion">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_engine_version
+    where engine_id = #{engineId,jdbcType=INTEGER}
+    and version = #{version,jdbcType=INTEGER}
+    order by sub_ver desc
+    limit 1
+  </select>
+  
+  <select id="getTargetEngineVersion" parameterType="java.util.Map" resultType="com.zw.rule.engine.po.EngineVersion">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_engine_version
+    where engine_id = #{engineId,jdbcType=INTEGER}
+    and version = #{version,jdbcType=INTEGER}
+    and sub_ver = #{subVer,jdbcType=INTEGER}
+    order by sub_ver desc
+    limit 1
+  </select>
+  
+  <select id="queryDeploiedVersionByEngineId" parameterType="java.lang.Long" resultType="com.zw.rule.engine.po.EngineVersion">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_engine_version
+    where engine_id = #{engineId,jdbcType=INTEGER}
+    and boot_state = 1
+  </select>
+  
+  <select id="queryLatestEngineVersion" parameterType="EngineVersion" resultType="com.zw.rule.engine.po.EngineVersion">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_engine_version
+    where engine_id = #{engineId,jdbcType=INTEGER}
+    order by version desc
+    limit 1
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="EngineVersionMap">
+    select 
+    <include refid="Base_Column_List" />
+    from zw_engine_version
+    where ver_id = #{verId,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from zw_engine_version
+    where ver_id = #{verId,jdbcType=INTEGER}
+  </delete>
+  
+  <delete id="cleanSubVersionByVersion" parameterType="java.util.Map">
+    delete from zw_engine_version
+    where engine_id = #{engineId,jdbcType=INTEGER}
+    and version = #{version,jdbcType=INTEGER}
+    and sub_ver != 0
+  </delete>
+  
+  <insert id="insert" parameterType="EngineVersion">
+    insert into zw_engine_version (ver_id, engine_id, version,
+      sub_ver, boot_state, status, layout, user_id,
+      create_time, latest_user, latest_time
+      )
+    values (#{verId,jdbcType=INTEGER}, #{engineId,jdbcType=INTEGER}, #{version,jdbcType=INTEGER},
+      #{subVer,jdbcType=INTEGER},#{bootState,jdbcType=BIT}, #{status,jdbcType=BIT}, #{layout,jdbcType=BIT},
+      #{userId,jdbcType=INTEGER}, #{createTime,jdbcType=VARCHAR}, #{latestUser,jdbcType=INTEGER}, 
+      #{latestTime,jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <insert id="insertEngineVersionAndReturnId" parameterType="EngineVersion" useGeneratedKeys="true" keyProperty="verId">
+    insert into zw_engine_version
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="engineId != null">
+        engine_id,
+      </if>
+      <if test="version != null">
+        version,
+      </if>
+      <if test="subVer != null">
+        sub_ver,
+      </if>
+      <if test="bootState != null">
+        boot_state,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="layout != null">
+        layout,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="latestUser != null">
+        latest_user,
+      </if>
+      <if test="latestTime != null">
+        latest_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="engineId != null">
+        #{engineId,jdbcType=INTEGER},
+      </if>
+      <if test="version != null">
+        #{version,jdbcType=INTEGER},
+      </if>
+      <if test="subVer != null">
+        #{subVer,jdbcType=INTEGER},
+      </if>
+      <if test="bootState != null">
+        #{bootState,jdbcType=BIT},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=BIT},
+      </if>
+      <if test="layout != null">
+        #{layout,jdbcType=BIT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="latestUser != null">
+        #{latestUser,jdbcType=INTEGER},
+      </if>
+      <if test="latestTime != null">
+        #{latestTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="EngineVersion">
+    update zw_engine_version
+    <set>
+      <if test="engineId != null">
+        engine_id = #{engineId,jdbcType=INTEGER},
+      </if>
+      <if test="version != null">
+        version = #{version,jdbcType=INTEGER},
+      </if>
+      <if test="subVer != null">
+        sub_ver = #{subVer,jdbcType=INTEGER},
+      </if>
+      <if test="bootState != null">
+        boot_state = #{bootState,jdbcType=BIT},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=BIT},
+      </if>
+      <if test="layout != null">
+        layout = #{layout,jdbcType=BIT},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="latestUser != null">
+        latest_user = #{latestUser,jdbcType=INTEGER},
+      </if>
+      <if test="latestTime != null">
+        latest_time = #{latestTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ver_id = #{verId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="undeployVersion" parameterType="java.lang.Long">
+    update zw_engine_version
+    set boot_state = 0
+    where engine_id = #{engineId,jdbcType=INTEGER}
+  </update>
+  
+  <update id="updateByPrimaryKey" parameterType="com.zw.rule.engine.po.EngineVersion">
+    update zw_engine_version
+    set engine_id = #{engineId,jdbcType=INTEGER},
+      version = #{version,jdbcType=INTEGER},
+      sub_ver = #{subVer,jdbcType=INTEGER},
+      boot_state = #{bootState,jdbcType=BIT},
+      status = #{status,jdbcType=BIT},
+      layout = #{layout,jdbcType=BIT},
+      user_id = #{userId,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=VARCHAR},
+      latest_user = #{latestUser,jdbcType=INTEGER},
+      latest_time = #{latestTime,jdbcType=VARCHAR}
+    where ver_id = #{verId,jdbcType=INTEGER}
+  </update>
+  
+  <select id="queryEngineVersionListByEngineId" parameterType="long" resultMap="EngineVersionMap">
+      select <include refid="Base_Column_List"/> from zw_engine_version where engine_id =#{id}
+      order by version,sub_ver
+  </select>
+  
+  <select id="queryEngineVersionByEngineId" parameterType="map" resultMap="EngineVersionMap">
+      select ev.ver_id as verId, ev.engine_id as engineId
+             , ev.version, ev.sub_ver as subVer, ev.latest_time as latestTime
+             , e.name as engineName, e.remark as engineDesc
+        from zw_engine_version ev,zw_engine e
+       where ev.engine_id = e.id
+         and e.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+         and ev.engine_id = #{engineId}
+       <if test="searchKey != null and searchKey !=''">
+          and e.name like CONCAT('%',TRIM('${searchKey}'),'%' )
+       </if>
+    order by ev.ver_id desc
+  </select>
+
+</mapper>

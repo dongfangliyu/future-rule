@@ -1,0 +1,13 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+version '1.0'
+
+dependencies {
+    compile project(":common-tools")
+}
+
+jar {
+    baseName = 'rule-model'
+}

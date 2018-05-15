@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.mapper.datamanage.FieldInterMapper">
+
+    <resultMap type="com.zw.rule.datamanage.po.FieldInter" id="FieldInter">
+        <id column="id" property="id"/>
+        <result column="field_rel_id" property="fieldRelId"/>
+        <result column="formula_field_id" property="formulaFieldId"/>
+        <result column="formula_field_rel_id" property="formulaFieldRelId"/>
+        <result column="sequence" property="sequence"/>
+        <result column="interval_partition" property="intervalPartition"/>
+        <result column="value" property="value"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="findByFieldRelId" parameterType="map"  resultMap="FieldInter">
+        select   i.interval_partition, i.value
+        from zw_field_interval i,zw_field f,zw_field_user_link r
+        where i.formula_field_id = f.id
+        and i.formula_field_rel_id = r.id
+        and r.org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and r.engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and r.engine_id is null
+        </if>
+        and formula_field_rel_id = #{fieldRelId}
+        and sequence = #{sequence}
+    </select>
+
+    <delete id="deleteInterval" parameterType="map" >
+        delete from zw_field_interval
+        where field_rel_id = ( select id
+        from zw_field_user_link
+        where field_id = #{fieldRelId}
+        and org_id = ( select org_id from zw_sys_user where user_id = #{userId} )
+        <if test="engineId != null">
+            and engine_id = #{engineId}
+        </if>
+        <if test="engineId == null">
+            and engine_id is null
+        </if>
+        )
+    </delete>
+
+    <insert id="batchCreateInterval" parameterType="java.util.List">
+        insert into zw_field_interval ( field_rel_id, formula_field_id, formula_field_rel_id, sequence, interval_partition, value, create_time )
+        values
+        <foreach collection="list" item="field" index="index" separator=",">
+            (
+            #{fieldInter.fieldRelId}, #{fieldInter.formulaFieldId}, #{fieldInter.formulaFieldRelId}
+            , #{fieldInter.sequence}, #{fieldInter.intervalPartition}, #{fieldInter.value}, now()
+            )
+        </foreach>
+    </insert>
+
+</mapper>

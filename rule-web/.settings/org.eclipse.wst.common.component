@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="rule-web">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <dependent-module archiveName="common-tools-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/common-tools/common-tools">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="dao-base-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/dao-base/dao-base">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="rule-mapper-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/rule-mapper/rule-mapper">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="rule-model-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/rule-model/rule-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="rule-util-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/rule-util/rule-util">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="rule-service-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/rule-service/rule-service">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="rule-web"/>
+        <property name="java-output-path" value="/rule-web/target/classes"/>
+    </wb-module>
+</project-modules>

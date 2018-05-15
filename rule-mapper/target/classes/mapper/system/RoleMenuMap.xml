@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zw.rule.po.RoleMenu">
+    <resultMap type="com.zw.rule.po.RoleMenu" id="RoleMenu">
+        <result column="role_id" property="roleId"/>
+        <result column="menu_id" property="menuId"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <insert id="addRoleRes">
+        insert into
+        zw_sys_role_menu(role_id,menu_id,is_delete,create_by,create_time,update_by,update_time,remark)
+        values(#{roleId},#{menuId},#{isDelete},#{createBy},#{createTime},#{updateBy},#{updateTime},#{remark})
+    </insert>
+
+    <select id="getListByRoleId" parameterType="java.lang.String" resultMap="RoleMenu">
+        select distinct(menu_id) as menu_id from zw_sys_role_menu where is_delete = 0 and role_id =#{roleId}
+    </select>
+
+    <select id="getMenuByRole" parameterType="java.lang.String" resultType="string">
+        select distinct(menu_id) as menu_id from zw_sys_role_menu where is_delete = 0 and role_id =#{roleId}
+    </select>
+
+    <delete id="deleteByRoleId" parameterType="java.util.List">
+        <!--delete from zw_sys_role_menu where is_delete = 0 and role_id = #{roleId}-->
+        update zw_sys_role_menu set is_delete=1
+        <where>
+            <if test="list!=null and list.size()>0">
+                and  role_id in
+                <foreach collection="list" item="roleId" index="index"
+                         open="(" separator="," close=")">#{roleId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+
+</mapper>

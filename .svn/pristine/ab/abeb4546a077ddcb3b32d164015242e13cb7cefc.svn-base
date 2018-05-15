@@ -1,0 +1,30 @@
+group 'com.zw'
+
+subprojects {
+
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public" }
+        maven { url "http://192.168.102.110:8081/nexus/content/groups/public" }
+        maven { url "http://repo.spring.io/libs-snapshot" }
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile 'junit:junit:4.11'
+    }
+
+    jar {
+        manifest.attributes provider: 'zw Fin Tec'
+    }
+
+    test {
+        systemProperties 'property': 'value'
+    }
+
+    [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+}
